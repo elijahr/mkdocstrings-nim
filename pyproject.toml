@@ -39,4 +39,12 @@ dev = [
 nim = "mkdocstrings_handlers.nim:get_handler"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mkdocstrings_handlers", "src"]
+packages = ["mkdocstrings_handlers"]
+
+[tool.hatch.build]
+include = [
+    "mkdocstrings_handlers/**/*.py",
+    "mkdocstrings_handlers/**/*.jinja",
+    "mkdocstrings_handlers/**/*.css",
+    "mkdocstrings_handlers/**/*.nim",
+]

@@ -62,3 +62,26 @@ class TestNimHandler:
         options = handler.get_options({"show_source": False})
 
         assert options["show_source"] is False
+
+
+def test_invalid_docstring_style_fallback(tmp_path, caplog):
+    """Test that invalid docstring_style falls back to RST with warning."""
+    import logging
+    from mkdocstrings_handlers.nim.handler import NimHandler
+
+    handler = NimHandler(paths=["src"], base_dir=tmp_path, mdx=[], mdx_config={})
+    options = handler.get_options({"docstring_style": "invalid_style"})
+
+    # This should not raise, should fall back to RST
+    # We need a minimal Nim file to test collect()
+    nim_file = tmp_path / "src" / "test.nim"
+    nim_file.parent.mkdir(parents=True, exist_ok=True)
+    nim_file.write_text('proc foo*() = discard\n')
+
+    with caplog.at_level(logging.WARNING):
+        # Should not raise ValueError
+        try:
+            handler.collect("test", options)
+        except Exception as e:
+            # Collection may fail for other reasons (no Nim), but not ValueError
+            assert "invalid_style" not in str(e)

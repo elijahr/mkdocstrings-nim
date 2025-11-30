@@ -103,7 +103,14 @@ class NimHandler(BaseHandler):
 
         # Parse docstrings with configured style
         style_str = options.get("docstring_style", "rst")
-        style = DocstringStyle(style_str)
+        try:
+            style = DocstringStyle(style_str)
+        except ValueError:
+            _logger.warning(
+                f"Unknown docstring_style '{style_str}', falling back to 'rst'. "
+                f"Valid options: {[s.value for s in DocstringStyle]}"
+            )
+            style = DocstringStyle.RST
         for entry in module.entries:
             self._parse_entry_docstring(entry, style)
 

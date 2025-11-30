@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass, field
+from importlib.resources import files, as_file
 from pathlib import Path
 from typing import Any
 
 from mkdocstrings import CollectionError
+
+# Cache directory for compiled nimdocinfo binary
+_CACHE_DIR = Path(tempfile.gettempdir()) / "mkdocstrings-nim-cache"
 
 
 @dataclass
@@ -57,7 +63,9 @@ class NimCollector:
         self.paths = paths
         self.base_dir = base_dir
         self._cache: dict[str, NimModule] = {}
-        self._nimdocinfo_path = Path(__file__).parent.parent.parent / "src" / "nimdocinfo" / "nimdocinfo.nim"
+        # Use importlib.resources for reliable path resolution
+        extractor_files = files("mkdocstrings_handlers.nim").joinpath("extractor")
+        self._nimdocinfo_source = extractor_files.joinpath("nimdocinfo.nim")
 
     def _resolve_identifier(self, identifier: str) -> Path:
         """Resolve a module identifier to a file path.
@@ -88,6 +96,59 @@ class NimCollector:
 
         raise CollectionError(f"Could not find Nim file for identifier: {identifier}")
 
+    def _ensure_nimdocinfo_compiled(self) -> Path:
+        """Ensure nimdocinfo is compiled and return path to binary.
+
+        Copies Nim source files to a cache directory and compiles them there.
+        This avoids writing to the installed package directory.
+
+        Returns:
+            Path to the compiled nimdocinfo binary.
+
+        Raises:
+            CollectionError: If compilation fails.
+        """
+        _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Get the extractor package files
+        extractor_pkg = files("mkdocstrings_handlers.nim").joinpath("extractor")
+
+        # Copy source files to cache if needed
+        with as_file(extractor_pkg.joinpath("nimdocinfo.nim")) as src_main:
+            with as_file(extractor_pkg.joinpath("extractor.nim")) as src_extractor:
+                cache_main = _CACHE_DIR / "nimdocinfo.nim"
+                cache_extractor = _CACHE_DIR / "extractor.nim"
+                cache_binary = _CACHE_DIR / "nimdocinfo"
+
+                # Check if we need to recompile (source newer than binary)
+                needs_compile = not cache_binary.exists()
+                if not needs_compile:
+                    binary_mtime = cache_binary.stat().st_mtime
+                    if src_main.stat().st_mtime > binary_mtime:
+                        needs_compile = True
+                    elif src_extractor.stat().st_mtime > binary_mtime:
+                        needs_compile = True
+
+                if needs_compile:
+                    # Copy source files
+                    shutil.copy2(src_main, cache_main)
+                    shutil.copy2(src_extractor, cache_extractor)
+
+                    # Compile (first run is slow, ~15s; subsequent runs use cache)
+                    result = subprocess.run(
+                        ["nim", "c", "--outdir:" + str(_CACHE_DIR), str(cache_main)],
+                        capture_output=True,
+                        text=True,
+                        timeout=120,  # First compile can be slow
+                    )
+
+                    if result.returncode != 0:
+                        raise CollectionError(
+                            f"Failed to compile nimdocinfo:\n{result.stderr}"
+                        )
+
+                return cache_binary
+
     def _run_nimdocinfo(self, filepath: Path) -> dict[str, Any]:
         """Run nimdocinfo on a Nim file.
 
@@ -101,19 +162,25 @@ class NimCollector:
             CollectionError: If nimdocinfo fails.
         """
         try:
+            binary_path = self._ensure_nimdocinfo_compiled()
+
             result = subprocess.run(
-                ["nim", "c", "-r", str(self._nimdocinfo_path), str(filepath)],
+                [str(binary_path), str(filepath)],
                 capture_output=True,
                 text=True,
                 cwd=str(self.base_dir),
+                timeout=60,
             )
 
             if result.returncode != 0:
-                raise CollectionError(f"nimdocinfo failed: {result.stderr}")
+                raise CollectionError(
+                    f"nimdocinfo failed:\n{result.stderr}\n\n"
+                    f"To debug, run manually:\n"
+                    f"  {binary_path} {filepath}"
+                )
 
-            # Parse JSON from stdout (skip compiler hints)
+            # Parse JSON from stdout
             lines = result.stdout.strip().split("\n")
-            # Find the JSON output - it starts with { and ends with }
             json_lines = []
             in_json = False
             for line in lines:
@@ -122,7 +189,6 @@ class NimCollector:
                 if in_json:
                     json_lines.append(line)
                 if in_json and line.strip().startswith("}") and len(json_lines) > 1:
-                    # Check if this closes the main object
                     try:
                         return json.loads("\n".join(json_lines))
                     except json.JSONDecodeError:
@@ -134,7 +200,15 @@ class NimCollector:
             return json.loads("\n".join(json_lines))
 
         except FileNotFoundError:
-            raise CollectionError("Nim compiler not found. Is Nim installed?")
+            raise CollectionError(
+                "Nim compiler not found. Install from https://nim-lang.org/install.html\n"
+                "Then verify installation: nim --version"
+            )
+        except subprocess.TimeoutExpired:
+            raise CollectionError(
+                f"nimdocinfo timed out processing {filepath}. "
+                "The file may be too complex or have circular imports."
+            )
         except json.JSONDecodeError as e:
             raise CollectionError(f"Invalid JSON from nimdocinfo: {e}")
 
