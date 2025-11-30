@@ -33,7 +33,7 @@ Context:
   <div class="doc doc-contents {% if root %}first{% endif %}">
     {% if entry.doc %}
       <div class="doc-description">
-        <p>{{ entry.doc }}</p>
+        {{ entry.doc | convert_markdown(heading_level, html_id) }}
       </div>
     {% endif %}
 
@@ -56,6 +56,17 @@ Context:
       <div class="doc-section doc-section-returns">
         <h{{ heading_level + 1 }}>Returns</h{{ heading_level + 1 }}>
         <p><code>{{ entry.returns }}</code>{% if entry.returns_doc %} – {{ entry.returns_doc }}{% endif %}</p>
+      </div>
+    {% endif %}
+
+    {% if entry.raises %}
+      <div class="doc-section doc-section-raises">
+        <h{{ heading_level + 1 }}>Raises</h{{ heading_level + 1 }}>
+        <ul>
+          {% for exc in entry.raises %}
+            <li><code>{{ exc }}</code></li>
+          {% endfor %}
+        </ul>
       </div>
     {% endif %}
 

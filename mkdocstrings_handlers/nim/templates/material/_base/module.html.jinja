@@ -18,7 +18,7 @@ Context:
   <div class="doc doc-contents first">
     {% if module.doc %}
       <div class="doc-description">
-        {{ module.doc }}
+        {{ module.doc | convert_markdown(heading_level, html_id) }}
       </div>
     {% endif %}
 

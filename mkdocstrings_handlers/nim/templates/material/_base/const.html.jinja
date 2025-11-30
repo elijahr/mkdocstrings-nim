@@ -24,7 +24,7 @@ Context:
   <div class="doc doc-contents">
     {% if entry.doc %}
       <div class="doc-description">
-        <p>{{ entry.doc }}</p>
+        {{ entry.doc | convert_markdown(heading_level, html_id) }}
       </div>
     {% endif %}
   </div>

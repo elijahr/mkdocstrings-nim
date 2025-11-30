@@ -11,6 +11,7 @@ type
     params*: seq[tuple[name, typ: string]]
     returns*: string
     pragmas*: seq[string]
+    raises*: seq[string]
     doc*: string
 
   ModuleDoc* = object
@@ -37,6 +38,24 @@ proc extractPragmas(n: PNode): seq[string] =
       result.add($child.ident.s)
     elif child.kind == nkExprColonExpr and child[0].kind == nkIdent:
       result.add($child[0].ident.s)
+
+proc extractRaises(n: PNode): seq[string] =
+  ## Extract exception types from raises pragma
+  ## e.g., {.raises: [ValueError, IOError].}
+  result = @[]
+  if n == nil or n.kind != nkPragma:
+    return
+  for child in n:
+    if child.kind == nkExprColonExpr and child.len >= 2:
+      if child[0].kind == nkIdent and $child[0].ident.s == "raises":
+        let bracket = child[1]
+        if bracket.kind == nkBracket:
+          for exc in bracket:
+            if exc.kind == nkIdent:
+              result.add($exc.ident.s)
+            elif exc.kind == nkDotExpr:
+              # Handle qualified names like system.Exception
+              result.add($exc)
 
 proc extractParams(n: PNode): seq[tuple[name, typ: string]] =
   ## Extract parameter list from formal params
@@ -123,6 +142,7 @@ proc extractProc(n: PNode, kind: string): DocEntry =
   # Extract pragmas at the correct index
   if n.len > routinePragmasIdx and n[routinePragmasIdx].kind == nkPragma:
     result.pragmas = extractPragmas(n[routinePragmasIdx])
+    result.raises = extractRaises(n[routinePragmasIdx])
 
   result.signature = renderSignature(n, kind, result.name)
 
@@ -217,5 +237,8 @@ proc toJson*(doc: ModuleDoc): JsonNode =
 
     if entry.pragmas.len > 0:
       entryJson["pragmas"] = %entry.pragmas
+
+    if entry.raises.len > 0:
+      entryJson["raises"] = %entry.raises
 
     result["entries"].add entryJson

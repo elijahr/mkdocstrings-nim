@@ -237,6 +237,7 @@ class NimCollector:
                 params=params,
                 returns=entry_data.get("returns", ""),
                 pragmas=entry_data.get("pragmas", []),
+                raises=entry_data.get("raises", []),
             ))
 
         return NimModule(
