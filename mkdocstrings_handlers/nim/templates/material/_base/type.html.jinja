@@ -1,0 +1,31 @@
+{#- Template for Nim types.
+
+Context:
+  entry (NimEntry): The entry to render.
+  root (bool): Whether this is the root object.
+  heading_level (int): The HTML heading level to use.
+  config (dict): The configuration options.
+-#}
+
+<div class="doc doc-object doc-type">
+  {% set html_id = entry.name %}
+
+  <h{{ heading_level }} id="{{ html_id }}" class="doc doc-heading">
+    <code class="doc-symbol doc-symbol-heading doc-symbol-type"></code>
+    <span class="doc doc-object-name doc-type-name">{{ entry.name }}</span>
+  </h{{ heading_level }}>
+
+  {% if config.show_signature %}
+    <div class="doc-signature highlight">
+      <pre><code class="language-nim">{{ entry.signature }}</code></pre>
+    </div>
+  {% endif %}
+
+  <div class="doc doc-contents">
+    {% if entry.doc %}
+      <div class="doc-description">
+        <p>{{ entry.doc }}</p>
+      </div>
+    {% endif %}
+  </div>
+</div>

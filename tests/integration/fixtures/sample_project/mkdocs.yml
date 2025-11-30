@@ -1,0 +1,14 @@
+site_name: Sample Lib Docs
+theme:
+  name: material
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        nim:
+          paths: [src]
+          docstring_style: rst
+
+nav:
+  - Home: index.md
+  - API: api.md
