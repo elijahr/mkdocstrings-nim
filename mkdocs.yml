@@ -59,6 +59,7 @@ nav:
   - Getting Started: getting-started.md
   - Configuration: configuration.md
   - Writing Docstrings: docstrings.md
+  - CI Integration: ci.md
   - Changelog: changelog.md
 
 extra:

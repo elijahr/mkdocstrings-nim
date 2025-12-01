@@ -53,3 +53,4 @@ The handler generates formatted documentation with:
 - [Getting Started](getting-started.md) - Installation and basic setup
 - [Configuration](configuration.md) - All available options
 - [Writing Docstrings](docstrings.md) - Docstring format reference
+- [CI Integration](ci.md) - GitHub Actions workflows
