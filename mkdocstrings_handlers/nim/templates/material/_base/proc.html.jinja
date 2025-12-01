@@ -11,7 +11,7 @@ Context:
   {% set html_id = entry.name %}
 
   {% if root or config.show_root_heading %}
-    <h{{ heading_level }} id="{{ html_id }}" class="doc doc-heading">
+    {% filter heading(heading_level, id=html_id, class="doc doc-heading", toc_label=entry.name) %}
       {% if config.show_symbol_type_heading %}
         <code class="doc-symbol doc-symbol-heading doc-symbol-{{ entry.kind }}"></code>
       {% endif %}
@@ -21,7 +21,7 @@ Context:
           <span class="doc-label" data-label="{{ pragma }}">{{ pragma }}</span>
         {% endfor %}
       {% endif %}
-    </h{{ heading_level }}>
+    {% endfilter %}
   {% endif %}
 
   {% if config.show_signature %}

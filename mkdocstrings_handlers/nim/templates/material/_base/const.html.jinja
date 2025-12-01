@@ -10,10 +10,10 @@ Context:
 <div class="doc doc-object doc-const">
   {% set html_id = entry.name %}
 
-  <h{{ heading_level }} id="{{ html_id }}" class="doc doc-heading">
+  {% filter heading(heading_level, id=html_id, class="doc doc-heading", toc_label=entry.name) %}
     <code class="doc-symbol doc-symbol-heading doc-symbol-const"></code>
     <span class="doc doc-object-name doc-const-name">{{ entry.name }}</span>
-  </h{{ heading_level }}>
+  {% endfilter %}
 
   {% if config.show_signature %}
     <div class="doc-signature highlight">

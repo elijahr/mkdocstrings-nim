@@ -27,6 +27,7 @@ class NimHandler(BaseHandler):
         *,
         theme: str = "material",
         custom_templates: str | None = None,
+        config_options: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize the handler.
@@ -36,6 +37,7 @@ class NimHandler(BaseHandler):
             base_dir: Base directory of the project.
             theme: MkDocs theme name.
             custom_templates: Path to custom templates.
+            config_options: Handler options from mkdocs.yml.
             **kwargs: Additional arguments for BaseHandler.
         """
         super().__init__(
@@ -45,10 +47,13 @@ class NimHandler(BaseHandler):
         )
         self.paths = paths or ["src"]
         self.base_dir = base_dir
+        self.config_options = config_options or {}
         self.collector = NimCollector(self.paths, base_dir)
 
     def get_options(self, local_options: MutableMapping[str, Any]) -> HandlerOptions:
         """Get combined options.
+
+        Merges defaults < config options < directive options (local_options).
 
         Args:
             local_options: Local options from the directive.
@@ -63,7 +68,7 @@ class NimHandler(BaseHandler):
             "heading_level": 2,
             "docstring_style": "rst",
         }
-        return {**defaults, **local_options}
+        return {**defaults, **self.config_options, **local_options}
 
     def _parse_entry_docstring(self, entry: NimEntry, style: DocstringStyle) -> None:
         """Parse docstring and update entry with structured documentation.
@@ -155,9 +160,11 @@ def get_handler(
     """
     base_dir = Path(getattr(tool_config, "config_file_path", "./mkdocs.yml")).parent
     paths = handler_config.get("paths", ["src"])
+    options = handler_config.get("options", {})
 
     return NimHandler(
         paths=paths,
         base_dir=base_dir,
+        config_options=options,
         **kwargs,
     )

@@ -10,10 +10,10 @@ Context:
 <div class="doc doc-object doc-module">
   {% set html_id = module.module %}
 
-  <h{{ heading_level }} id="{{ html_id }}" class="doc doc-heading">
+  {% filter heading(heading_level, id=html_id, class="doc doc-heading", toc_label=module.module) %}
     <code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>
     <span class="doc doc-object-name doc-module-name">{{ module.module }}</span>
-  </h{{ heading_level }}>
+  {% endfilter %}
 
   <div class="doc doc-contents first">
     {% if module.doc %}
@@ -24,7 +24,9 @@ Context:
 
     {% for entry in module.entries %}
       {% set template_name = entry.kind ~ ".html.jinja" %}
-      {% include template_name %}
+      {% with heading_level = heading_level + 1 %}
+        {% include template_name %}
+      {% endwith %}
     {% endfor %}
   </div>
 </div>

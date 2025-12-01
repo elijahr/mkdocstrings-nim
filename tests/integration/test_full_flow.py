@@ -97,6 +97,13 @@ class TestFullFlow:
         # This allows testing template rendering without full MkDocs infrastructure
         handler.env.filters["convert_markdown"] = lambda text, *args, **kwargs: text
 
+        # Mock the heading filter to just wrap content in a heading tag
+        def mock_heading(text, level, **kwargs):
+            html_id = kwargs.get("id", "")
+            html_class = kwargs.get("class", "")
+            return f'<h{level} id="{html_id}" class="{html_class}">{text}</h{level}>'
+        handler.env.filters["heading"] = mock_heading
+
         options = handler.get_options({})
         module = handler.collect("mylib", options)
         html = handler.render(module, options)
