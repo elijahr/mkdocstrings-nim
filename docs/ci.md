@@ -22,9 +22,9 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: jiro4989/setup-nim-action@v2
+      - uses: iffy/install-nim@v5
         with:
-          nim-version: 'stable'
+          version: stable
 
       - name: Install dependencies
         run: pip install mkdocs mkdocstrings-nim mkdocs-material
@@ -66,9 +66,9 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: jiro4989/setup-nim-action@v2
+      - uses: iffy/install-nim@v5
         with:
-          nim-version: 'stable'
+          version: stable
 
       - name: Install dependencies
         run: pip install mkdocs mkdocstrings-nim mkdocs-material mike
@@ -97,7 +97,7 @@ jobs:
 CI environments need:
 
 1. **Python 3.9+** - For mkdocstrings-nim
-2. **Nim compiler** - Use `jiro4989/setup-nim-action@v2` or `nim-lang/setup-nimble-action@v1` on GitHub Actions
+2. **Nim compiler with compiler modules** - The handler uses Nim's internal compiler API to parse source files. Use [`iffy/install-nim@v5`](https://github.com/iffy/install-nim) which properly sets up access to compiler modules. Alternatives like `jiro4989/setup-nim-action` or `nim-lang/setup-nimble-action` may not include the required compiler sources.
 3. **Dependencies** - Install via pip or a requirements file
 
 Example `docs-requirements.txt`:
