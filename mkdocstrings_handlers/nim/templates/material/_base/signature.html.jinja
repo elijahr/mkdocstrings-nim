@@ -68,7 +68,6 @@ Context:
           {%- set ns.default = False -%}
         {%- endif -%}
 
-        {#- TODO: Move inside kind handling above? -#}
         {%- if parameter.kind.value == "variadic positional" -%}
           {%- set ns.render_kw_only_separator = False -%}
         {%- endif -%}

@@ -7,7 +7,10 @@ from enum import Enum
 from typing import Optional
 
 import docstring_parser
-from docstring_parser import DocstringStyle as DPStyle
+from docstring_parser import DocstringStyle as DPStyle, ParseError
+from mkdocstrings import get_logger
+
+_logger = get_logger(__name__)
 
 
 class DocstringStyle(Enum):
@@ -81,12 +84,14 @@ def parse_docstring(doc: str, style: DocstringStyle = DocstringStyle.RST) -> Par
 
     try:
         parsed = docstring_parser.parse(doc, style=dp_style)
-    except Exception:
+    except (ParseError, ValueError) as e:
         # Fall back to auto-detection if specified style fails
+        _logger.debug(f"Failed to parse docstring with {style}: {e}")
         try:
             parsed = docstring_parser.parse(doc)
-        except Exception:
+        except (ParseError, ValueError) as e:
             # If all parsing fails, just return description
+            _logger.debug(f"Auto-detection also failed: {e}")
             return ParsedDocstring(description=doc.strip())
 
     result = ParsedDocstring()

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from importlib.resources import files, as_file
 from pathlib import Path
@@ -16,6 +18,13 @@ from mkdocstrings import CollectionError
 
 # Cache directory for compiled nimdocinfo binary
 _CACHE_DIR = Path(tempfile.gettempdir()) / "mkdocstrings-nim-cache"
+
+# Maximum number of modules to cache per collector instance
+_MAX_CACHE_SIZE = 128
+
+# Sentinel markers for JSON extraction (must match nimdocinfo.nim)
+_JSON_START_MARKER = "<<MKDOCSTRINGS_JSON_START>>"
+_JSON_END_MARKER = "<<MKDOCSTRINGS_JSON_END>>"
 
 
 @dataclass
@@ -62,7 +71,7 @@ class NimCollector:
         """
         self.paths = paths
         self.base_dir = base_dir
-        self._cache: dict[str, NimModule] = {}
+        self._cache: OrderedDict[str, NimModule] = OrderedDict()
         # Use importlib.resources for reliable path resolution
         extractor_files = files("mkdocstrings_handlers.nim").joinpath("extractor")
         self._nimdocinfo_source = extractor_files.joinpath("nimdocinfo.nim")
@@ -102,6 +111,8 @@ class NimCollector:
         Copies Nim source files to a cache directory and compiles them there.
         This avoids writing to the installed package directory.
 
+        Thread-safe: Uses atomic rename pattern to handle concurrent compilation.
+
         Returns:
             Path to the compiled nimdocinfo binary.
 
@@ -109,34 +120,35 @@ class NimCollector:
             CollectionError: If compilation fails.
         """
         _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        cache_binary = _CACHE_DIR / "nimdocinfo"
 
         # Get the extractor package files
         extractor_pkg = files("mkdocstrings_handlers.nim").joinpath("extractor")
 
-        # Copy source files to cache if needed
         with as_file(extractor_pkg.joinpath("nimdocinfo.nim")) as src_main:
             with as_file(extractor_pkg.joinpath("extractor.nim")) as src_extractor:
-                cache_main = _CACHE_DIR / "nimdocinfo.nim"
-                cache_extractor = _CACHE_DIR / "extractor.nim"
-                cache_binary = _CACHE_DIR / "nimdocinfo"
-
-                # Check if we need to recompile (source newer than binary)
-                needs_compile = not cache_binary.exists()
-                if not needs_compile:
+                # Fast path: binary exists and is up-to-date
+                if cache_binary.exists():
                     binary_mtime = cache_binary.stat().st_mtime
-                    if src_main.stat().st_mtime > binary_mtime:
-                        needs_compile = True
-                    elif src_extractor.stat().st_mtime > binary_mtime:
-                        needs_compile = True
+                    if (src_main.stat().st_mtime <= binary_mtime and
+                            src_extractor.stat().st_mtime <= binary_mtime):
+                        return cache_binary
 
-                if needs_compile:
-                    # Copy source files
-                    shutil.copy2(src_main, cache_main)
-                    shutil.copy2(src_extractor, cache_extractor)
+                # Need to compile - use atomic rename pattern for thread safety
+                # Compile in a temp directory, then atomically rename
+                with tempfile.TemporaryDirectory(dir=_CACHE_DIR) as tmp_dir:
+                    tmp_path = Path(tmp_dir)
+                    tmp_main = tmp_path / "nimdocinfo.nim"
+                    tmp_extractor = tmp_path / "extractor.nim"
+                    tmp_binary = tmp_path / "nimdocinfo"
 
-                    # Compile (first run is slow, ~15s; subsequent runs use cache)
+                    # Copy source files to temp directory
+                    shutil.copy2(src_main, tmp_main)
+                    shutil.copy2(src_extractor, tmp_extractor)
+
+                    # Compile in temp directory
                     result = subprocess.run(
-                        ["nim", "c", "--outdir:" + str(_CACHE_DIR), str(cache_main)],
+                        ["nim", "c", f"--outdir:{tmp_path}", str(tmp_main)],
                         capture_output=True,
                         text=True,
                         timeout=120,  # First compile can be slow
@@ -147,7 +159,48 @@ class NimCollector:
                             f"Failed to compile nimdocinfo:\n{result.stderr}"
                         )
 
+                    # Atomic rename - if another process won the race, that's fine
+                    try:
+                        os.replace(tmp_binary, cache_binary)
+                    except OSError:
+                        # Another process may have beat us - check if binary exists
+                        if not cache_binary.exists():
+                            raise
+
                 return cache_binary
+
+    def _extract_json(self, stdout: str, filepath: Path) -> dict[str, Any]:
+        """Extract JSON from stdout using sentinel markers.
+
+        Args:
+            stdout: Raw stdout from nimdocinfo.
+            filepath: Path to the source file (for error messages).
+
+        Returns:
+            Parsed JSON data.
+
+        Raises:
+            CollectionError: If markers not found or JSON invalid.
+        """
+        start_idx = stdout.find(_JSON_START_MARKER)
+        end_idx = stdout.find(_JSON_END_MARKER)
+
+        if start_idx == -1 or end_idx == -1:
+            # Truncate output for error message
+            preview = stdout[:500] + ("..." if len(stdout) > 500 else "")
+            raise CollectionError(
+                f"Could not find JSON markers in nimdocinfo output for {filepath}.\n"
+                f"This may indicate the nimdocinfo binary is outdated. "
+                f"Try deleting the cache: rm -rf {_CACHE_DIR}\n"
+                f"Output was:\n{preview}"
+            )
+
+        json_str = stdout[start_idx + len(_JSON_START_MARKER):end_idx].strip()
+
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            raise CollectionError(f"Invalid JSON from nimdocinfo: {e}")
 
     def _run_nimdocinfo(self, filepath: Path) -> dict[str, Any]:
         """Run nimdocinfo on a Nim file.
@@ -179,25 +232,8 @@ class NimCollector:
                     f"  {binary_path} {filepath}"
                 )
 
-            # Parse JSON from stdout
-            lines = result.stdout.strip().split("\n")
-            json_lines = []
-            in_json = False
-            for line in lines:
-                if line.strip().startswith("{"):
-                    in_json = True
-                if in_json:
-                    json_lines.append(line)
-                if in_json and line.strip().startswith("}") and len(json_lines) > 1:
-                    try:
-                        return json.loads("\n".join(json_lines))
-                    except json.JSONDecodeError:
-                        continue
-
-            if not json_lines:
-                raise CollectionError(f"No JSON output from nimdocinfo: {result.stdout}")
-
-            return json.loads("\n".join(json_lines))
+            # Extract JSON using sentinel markers
+            return self._extract_json(result.stdout, filepath)
 
         except FileNotFoundError:
             raise CollectionError(
@@ -209,8 +245,6 @@ class NimCollector:
                 f"nimdocinfo timed out processing {filepath}. "
                 "The file may be too complex or have circular imports."
             )
-        except json.JSONDecodeError as e:
-            raise CollectionError(f"Invalid JSON from nimdocinfo: {e}")
 
     def _parse_module(self, data: dict[str, Any]) -> NimModule:
         """Parse JSON data into NimModule.
@@ -220,9 +254,30 @@ class NimCollector:
 
         Returns:
             Parsed NimModule.
+
+        Raises:
+            CollectionError: If required fields are missing.
         """
+        # Validate required module-level fields
+        required_fields = {"module", "file", "entries"}
+        missing = required_fields - data.keys()
+        if missing:
+            raise CollectionError(
+                f"Invalid nimdocinfo output: missing required fields {missing}. "
+                f"Got keys: {list(data.keys())}"
+            )
+
         entries = []
-        for entry_data in data.get("entries", []):
+        for i, entry_data in enumerate(data.get("entries", [])):
+            # Validate required entry-level fields
+            entry_required = {"name", "kind", "line", "signature"}
+            entry_missing = entry_required - entry_data.keys()
+            if entry_missing:
+                raise CollectionError(
+                    f"Entry {i} missing required fields {entry_missing}. "
+                    f"Got keys: {list(entry_data.keys())}"
+                )
+
             params = [
                 NimParam(name=p["name"], type=p["type"])
                 for p in entry_data.get("params", [])
@@ -250,6 +305,9 @@ class NimCollector:
     def collect(self, identifier: str) -> NimModule:
         """Collect documentation for a module identifier.
 
+        Uses LRU cache to avoid re-parsing modules. Cache is bounded
+        to _MAX_CACHE_SIZE entries.
+
         Args:
             identifier: Module identifier like 'lockfreequeues.ops'
 
@@ -257,11 +315,17 @@ class NimCollector:
             NimModule with documentation.
         """
         if identifier in self._cache:
+            # Move to end for LRU behavior
+            self._cache.move_to_end(identifier)
             return self._cache[identifier]
 
         filepath = self._resolve_identifier(identifier)
         data = self._run_nimdocinfo(filepath)
         module = self._parse_module(data)
+
+        # Evict oldest entries if cache is full
+        while len(self._cache) >= _MAX_CACHE_SIZE:
+            self._cache.popitem(last=False)
 
         self._cache[identifier] = module
         return module

@@ -2,6 +2,10 @@
 import std/[json, os]
 import extractor
 
+const
+  JsonStartMarker* = "<<MKDOCSTRINGS_JSON_START>>"
+  JsonEndMarker* = "<<MKDOCSTRINGS_JSON_END>>"
+
 when isMainModule:
   if paramCount() < 1:
     echo "Usage: nimdocinfo <file.nim>"
@@ -13,4 +17,6 @@ when isMainModule:
     quit(1)
 
   let doc = extractModule(filepath)
+  echo JsonStartMarker
   echo doc.toJson.pretty
+  echo JsonEndMarker
