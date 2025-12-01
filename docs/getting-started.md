@@ -28,6 +28,17 @@ plugins:
       handlers:
         nim:
           paths: [src]
+          options:
+            heading_level: 3  # Recommended for TOC integration
+```
+
+For the right-side table of contents to include API items, also configure:
+
+```yaml
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 4  # Include h2, h3, h4 in TOC
 ```
 
 ### 2. Write Documented Nim Code
