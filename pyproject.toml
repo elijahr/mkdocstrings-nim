@@ -56,3 +56,6 @@ include = [
     "mkdocstrings_handlers/**/*.css",
     "mkdocstrings_handlers/**/*.nim",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
