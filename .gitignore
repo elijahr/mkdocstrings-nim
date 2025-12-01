@@ -48,6 +48,7 @@ src/nimdocinfo/nimdocinfo
 
 # MkDocs
 site/
+docs/plans/
 
 # OS
 .DS_Store

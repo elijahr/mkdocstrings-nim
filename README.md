@@ -2,7 +2,7 @@
 
 A [mkdocstrings](https://mkdocstrings.github.io/) handler for [Nim](https://nim-lang.org/).
 
-Generate beautiful API documentation for your Nim projects, integrated into your MkDocs site.
+Parses Nim source files using the Nim compiler's AST to extract module docstrings, procedure signatures, parameter types, return types, and `{.raises.}` pragma annotations. Renders the extracted documentation as HTML within [MkDocs](https://www.mkdocs.org/) using the `::: module` directive syntax.
 
 ## Installation
 
@@ -66,14 +66,9 @@ proc greet*(name: string): string =
 ## Development
 
 ```bash
-# Clone the repo
-git clone https://github.com/you/mkdocstrings-nim
+git clone https://github.com/elijahr/mkdocstrings-nim
 cd mkdocstrings-nim
-
-# Install dev dependencies
 pip install -e ".[dev]"
-
-# Run tests
 pytest
 ```
 
