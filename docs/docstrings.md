@@ -144,7 +144,7 @@ proc factorial*(n: int): int =
 
 ## Docstring Styles
 
-The handler supports multiple docstring styles for documenting parameters, return values, and exceptions:
+The `docstring_style` option controls how **structured sections** (parameters, returns, raises) are parsed:
 
 - **RST** (default) - Uses `:param:`, `:returns:`, `:raises:` directives
 - **Google** - Uses `Args:`, `Returns:`, `Raises:` sections
@@ -158,21 +158,16 @@ Set the style in your `mkdocs.yml`:
 handlers:
   nim:
     options:
-      docstring_style: google  # or "rst", "numpy"
+      docstring_style: google  # or "rst", "numpy", "epydoc", "auto"
 ```
 
 See [Configuration](configuration.md#docstring-styles) for examples of each style.
 
-## Markdown in Docstrings
+## Markdown Content (Important)
 
-All docstring text content is rendered as Markdown. This applies to:
+While the `docstring_style` controls how structured sections are parsed, all **prose content** is rendered as Markdown. This is the same approach used by mkdocstrings-python.
 
-- Description text
-- Parameter descriptions
-- Return value descriptions
-- Raise descriptions
-
-This means you can use:
+Use Markdown formatting in your docstrings:
 
 ```nim
 proc format*(text: string): string =
@@ -185,7 +180,59 @@ proc format*(text: string): string =
   ## - [links](https://example.com)
   ##
   ## > Blockquotes work too.
+  ##
+  ## Code blocks use fences:
+  ##
+  ## ```nim
+  ## let x = format("hello")
+  ## ```
   result = text
 ```
 
-The docstring **style** (RST/Google/NumPy) determines how structured sections like parameters and returns are parsed. The **content** within those sections is then rendered as Markdown.
+### What Works
+
+| Syntax | Example |
+|--------|---------|
+| Bold | `**bold**` |
+| Italic | `*italic*` |
+| Code | `` `code` `` |
+| Links | `[text](url)` |
+| Lists | `- item` or `1. item` |
+| Headings | `## Heading` |
+| Code blocks | ` ```nim ... ``` ` |
+| Blockquotes | `> quote` |
+
+### What Does NOT Work
+
+RST-specific formatting is **not supported** for prose content:
+
+```nim
+# DON'T do this:
+proc example*() =
+  ## Example::            <-- RST code block syntax won't work
+  ##
+  ##   indented code      <-- Will render as plain text
+  ##
+  ## See :ref:`other`     <-- RST cross-references won't work
+```
+
+Instead, use Markdown:
+
+```nim
+# DO this:
+proc example*() =
+  ## Example:
+  ##
+  ## ```nim
+  ## code here
+  ## ```
+  ##
+  ## See [other](other.md)
+```
+
+### Summary
+
+| Aspect | Format |
+|--------|--------|
+| Structured sections (`:param:`, `Args:`) | Determined by `docstring_style` |
+| Prose content (descriptions, examples) | **Markdown** |
