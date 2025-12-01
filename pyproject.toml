@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
     "mkdocstrings>=0.20",
     "Jinja2>=3.0",
+    "docstring-parser>=0.15",
 ]
 
 [project.optional-dependencies]

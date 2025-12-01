@@ -24,7 +24,7 @@ plugins:
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `paths` | list | `["src"]` | Directories to search for Nim source files |
-| `docstring_style` | string | `"rst"` | Docstring format: `rst`, `google`, or `numpy` |
+| `docstring_style` | string | `"rst"` | Docstring format: `rst`, `google`, `numpy`, `epydoc`, or `auto` |
 | `show_source` | bool | `true` | Show source file line numbers |
 | `show_signature` | bool | `true` | Show full procedure signatures |
 | `show_pragmas` | bool | `true` | Show pragma annotations |

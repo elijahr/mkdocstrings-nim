@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
+
+import docstring_parser
+from docstring_parser import DocstringStyle as DPStyle
 
 
 class DocstringStyle(Enum):
@@ -13,6 +15,8 @@ class DocstringStyle(Enum):
     RST = "rst"
     GOOGLE = "google"
     NUMPY = "numpy"
+    EPYDOC = "epydoc"
+    AUTO = "auto"
 
 
 @dataclass
@@ -47,124 +51,21 @@ class ParsedDocstring:
     examples: list[str] = field(default_factory=list)
 
 
-def parse_rst_docstring(doc: str) -> ParsedDocstring:
-    """Parse RST-style docstring.
-
-    Args:
-        doc: Raw docstring text.
-
-    Returns:
-        Parsed docstring structure.
-    """
-    result = ParsedDocstring()
-
-    lines = doc.strip().split("\n")
-    description_lines = []
-    in_description = True
-
-    # Patterns for RST directives
-    param_pattern = re.compile(r":param\s+(\w+):\s*(.*)")
-    returns_pattern = re.compile(r":returns?:\s*(.*)")
-    raises_pattern = re.compile(r":raises?\s+(\w+):\s*(.*)")
-
-    i = 0
-    while i < len(lines):
-        line = lines[i].strip()
-
-        # Check for RST directives
-        param_match = param_pattern.match(line)
-        returns_match = returns_pattern.match(line)
-        raises_match = raises_pattern.match(line)
-
-        if param_match:
-            in_description = False
-            result.params.append(ParamDoc(
-                name=param_match.group(1),
-                description=param_match.group(2).strip(),
-            ))
-        elif returns_match:
-            in_description = False
-            result.returns = ReturnsDoc(description=returns_match.group(1).strip())
-        elif raises_match:
-            in_description = False
-            result.raises.append(RaisesDoc(
-                type=raises_match.group(1),
-                description=raises_match.group(2).strip(),
-            ))
-        elif in_description:
-            if line or description_lines:  # Skip leading blank lines
-                description_lines.append(line)
-
-        i += 1
-
-    # Clean up description
-    result.description = "\n".join(description_lines).strip()
-
-    return result
-
-
-def parse_google_docstring(doc: str) -> ParsedDocstring:
-    """Parse Google-style docstring.
-
-    Args:
-        doc: Raw docstring text.
-
-    Returns:
-        Parsed docstring structure.
-    """
-    result = ParsedDocstring()
-
-    lines = doc.strip().split("\n")
-    current_section = "description"
-    description_lines = []
-
-    section_pattern = re.compile(r"^(Args|Arguments|Parameters|Returns|Raises|Examples):\s*$", re.IGNORECASE)
-    param_pattern = re.compile(r"^\s+(\w+):\s*(.*)")
-
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-
-        section_match = section_pattern.match(line.strip())
-        if section_match:
-            section_name = section_match.group(1).lower()
-            if section_name in ("args", "arguments", "parameters"):
-                current_section = "params"
-            elif section_name == "returns":
-                current_section = "returns"
-            elif section_name == "raises":
-                current_section = "raises"
-            else:
-                current_section = section_name
-        elif current_section == "description":
-            description_lines.append(line)
-        elif current_section == "params":
-            param_match = param_pattern.match(line)
-            if param_match:
-                result.params.append(ParamDoc(
-                    name=param_match.group(1),
-                    description=param_match.group(2).strip(),
-                ))
-        elif current_section == "returns":
-            if line.strip():
-                result.returns = ReturnsDoc(description=line.strip())
-                current_section = ""
-        elif current_section == "raises":
-            param_match = param_pattern.match(line)
-            if param_match:
-                result.raises.append(RaisesDoc(
-                    type=param_match.group(1),
-                    description=param_match.group(2).strip(),
-                ))
-
-        i += 1
-
-    result.description = "\n".join(description_lines).strip()
-    return result
+# Map our style enum to docstring_parser's style enum
+_STYLE_MAP = {
+    DocstringStyle.RST: DPStyle.REST,
+    DocstringStyle.GOOGLE: DPStyle.GOOGLE,
+    DocstringStyle.NUMPY: DPStyle.NUMPYDOC,
+    DocstringStyle.EPYDOC: DPStyle.EPYDOC,
+    DocstringStyle.AUTO: DPStyle.AUTO,
+}
 
 
 def parse_docstring(doc: str, style: DocstringStyle = DocstringStyle.RST) -> ParsedDocstring:
     """Parse a docstring according to the specified style.
+
+    Uses the docstring_parser library for robust parsing of RST, Google,
+    and NumPy docstring formats.
 
     Args:
         doc: Raw docstring text.
@@ -176,10 +77,53 @@ def parse_docstring(doc: str, style: DocstringStyle = DocstringStyle.RST) -> Par
     if not doc:
         return ParsedDocstring()
 
-    if style == DocstringStyle.RST:
-        return parse_rst_docstring(doc)
-    elif style == DocstringStyle.GOOGLE:
-        return parse_google_docstring(doc)
-    else:
-        # Default to RST
-        return parse_rst_docstring(doc)
+    dp_style = _STYLE_MAP.get(style, DPStyle.REST)
+
+    try:
+        parsed = docstring_parser.parse(doc, style=dp_style)
+    except Exception:
+        # Fall back to auto-detection if specified style fails
+        try:
+            parsed = docstring_parser.parse(doc)
+        except Exception:
+            # If all parsing fails, just return description
+            return ParsedDocstring(description=doc.strip())
+
+    result = ParsedDocstring()
+
+    # Extract description (short + long)
+    desc_parts = []
+    if parsed.short_description:
+        desc_parts.append(parsed.short_description)
+    if parsed.long_description:
+        desc_parts.append(parsed.long_description)
+    result.description = "\n\n".join(desc_parts)
+
+    # Extract parameters
+    for param in parsed.params:
+        result.params.append(ParamDoc(
+            name=param.arg_name,
+            description=param.description or "",
+            type=param.type_name or "",
+        ))
+
+    # Extract returns
+    if parsed.returns:
+        result.returns = ReturnsDoc(
+            description=parsed.returns.description or "",
+            type=parsed.returns.type_name or "",
+        )
+
+    # Extract raises
+    for raises in parsed.raises:
+        result.raises.append(RaisesDoc(
+            type=raises.type_name or "",
+            description=raises.description or "",
+        ))
+
+    # Extract examples
+    for example in parsed.examples:
+        if example.description:
+            result.examples.append(example.description)
+
+    return result

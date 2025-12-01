@@ -142,9 +142,37 @@ proc factorial*(n: int): int =
   else: n * factorial(n - 1)
 ```
 
+## Docstring Styles
+
+The handler supports multiple docstring styles for documenting parameters, return values, and exceptions:
+
+- **RST** (default) - Uses `:param:`, `:returns:`, `:raises:` directives
+- **Google** - Uses `Args:`, `Returns:`, `Raises:` sections
+- **NumPy** - Uses section headers with underlines (`Parameters`, `Returns`, etc.)
+- **Epydoc** - Uses `@param`, `@return`, `@raise` tags
+- **Auto** - Automatically detects the style
+
+Set the style in your `mkdocs.yml`:
+
+```yaml
+handlers:
+  nim:
+    options:
+      docstring_style: google  # or "rst", "numpy"
+```
+
+See [Configuration](configuration.md#docstring-styles) for examples of each style.
+
 ## Markdown in Docstrings
 
-Docstrings support markdown formatting:
+All docstring text content is rendered as Markdown. This applies to:
+
+- Description text
+- Parameter descriptions
+- Return value descriptions
+- Raise descriptions
+
+This means you can use:
 
 ```nim
 proc format*(text: string): string =
@@ -159,3 +187,5 @@ proc format*(text: string): string =
   ## > Blockquotes work too.
   result = text
 ```
+
+The docstring **style** (RST/Google/NumPy) determines how structured sections like parameters and returns are parsed. The **content** within those sections is then rendered as Markdown.
