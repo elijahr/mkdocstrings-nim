@@ -21,10 +21,34 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup Nim
-        uses: jiro4989/setup-nim-action@v2
+      - name: Cache Nim
+        id: cache-nim
+        uses: actions/cache@v4
         with:
-          nim-version: 'stable'
+          path: |
+            ~/Nim
+            ~/.nimble
+          key: nim-source-2.0.8-${{ runner.os }}
+
+      - name: Build Nim from source
+        if: steps.cache-nim.outputs.cache-hit != 'true'
+        run: |
+          cd ~
+          git clone --depth 1 --branch v2.0.8 https://github.com/nim-lang/Nim.git
+          cd Nim
+          sh build_all.sh
+
+      - name: Setup Nim PATH
+        run: |
+          echo "$HOME/Nim/bin" >> $GITHUB_PATH
+          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
+
+      - name: Verify Nim
+        run: |
+          nim --version
+          # Verify compiler modules are available
+          echo 'import compiler/ast; echo "OK"' > /tmp/test_compiler.nim
+          nim c -r /tmp/test_compiler.nim
 
       - name: Install dependencies
         run: |
