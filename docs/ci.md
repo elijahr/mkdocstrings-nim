@@ -24,7 +24,12 @@ jobs:
 
       - uses: iffy/install-nim@v5
         with:
-          version: stable
+          version: binary:stable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install compiler modules
+        run: nimble install compiler -y
 
       - name: Install dependencies
         run: pip install mkdocs mkdocstrings-nim mkdocs-material
@@ -68,7 +73,12 @@ jobs:
 
       - uses: iffy/install-nim@v5
         with:
-          version: stable
+          version: binary:stable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install compiler modules
+        run: nimble install compiler -y
 
       - name: Install dependencies
         run: pip install mkdocs mkdocstrings-nim mkdocs-material mike
@@ -97,8 +107,9 @@ jobs:
 CI environments need:
 
 1. **Python 3.9+** - For mkdocstrings-nim
-2. **Nim compiler with compiler modules** - The handler uses Nim's internal compiler API to parse source files. Use [`iffy/install-nim@v5`](https://github.com/iffy/install-nim) which properly sets up access to compiler modules. Alternatives like `jiro4989/setup-nim-action` or `nim-lang/setup-nimble-action` may not include the required compiler sources.
-3. **Dependencies** - Install via pip or a requirements file
+2. **Nim compiler** - Use [`iffy/install-nim@v5`](https://github.com/iffy/install-nim) with `version: binary:stable` for fast binary installation
+3. **Compiler modules** - Run `nimble install compiler -y` to install Nim's compiler API modules needed for AST parsing
+4. **Dependencies** - Install via pip or a requirements file
 
 Example `docs-requirements.txt`:
 

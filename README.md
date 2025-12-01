@@ -52,7 +52,7 @@ mkdocs build
 | Option | Default | Description |
 |--------|---------|-------------|
 | `paths` | `["src"]` | Search paths for Nim source files |
-| `docstring_style` | `"rst"` | Docstring format: `rst`, `google`, or `numpy` |
+| `docstring_style` | `"rst"` | Docstring format: `rst`, `google`, `numpy`, `epydoc`, or `auto` |
 | `show_source` | `true` | Show source line numbers |
 | `show_signature` | `true` | Show full signatures |
 | `show_pragmas` | `true` | Show pragma annotations |
