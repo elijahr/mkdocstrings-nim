@@ -20,7 +20,7 @@ Parses Nim source files using the Nim compiler's AST to extract module docstring
 
 ## Quick Example
 
-Given this Nim code:
+Given `src/math_utils.nim`:
 
 ```nim
 ## Math utilities module.
