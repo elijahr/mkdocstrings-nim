@@ -68,6 +68,16 @@ mkdocs serve   # Development server
 mkdocs build   # Production build
 ```
 
+### 5. Enable Hot Reload for Source Files
+
+By default, `mkdocs serve` only watches the `docs/` directory. To reload when Nim source files change, add `watch` to your `mkdocs.yml`:
+
+```yaml
+watch:
+  - docs
+  - src  # Reload when Nim source files change
+```
+
 ## Project Structure
 
 Recommended layout:
