@@ -27,5 +27,18 @@ Context:
         {{ entry.doc | convert_markdown(heading_level, html_id) }}
       </div>
     {% endif %}
+
+    {% if config.show_source and entry.line %}
+      <div class="doc-source">
+        <span class="doc-source-label">Source:</span>
+        {% if config.source_url %}
+          <a href="{{ config.source_url }}/blob/{{ config.source_ref }}/{{ module.file }}#L{{ entry.line }}" target="_blank" rel="noopener">
+            {{ module.file }}:{{ entry.line }}
+          </a>
+        {% else %}
+          <code>{{ module.file }}:{{ entry.line }}</code>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 </div>

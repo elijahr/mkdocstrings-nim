@@ -67,6 +67,8 @@ class NimHandler(BaseHandler):
             "show_pragmas": True,
             "heading_level": 2,
             "docstring_style": "rst",
+            "source_url": None,  # e.g., "https://github.com/owner/repo"
+            "source_ref": "main",  # branch or tag
         }
         return {**defaults, **self.config_options, **local_options}
 

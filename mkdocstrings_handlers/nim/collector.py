@@ -295,9 +295,17 @@ class NimCollector:
                 raises=entry_data.get("raises", []),
             ))
 
+        # Make file path relative to base_dir for source links
+        file_path = Path(data["file"])
+        try:
+            relative_file = file_path.relative_to(self.base_dir)
+        except ValueError:
+            # If path is not relative to base_dir, use as-is
+            relative_file = file_path
+
         return NimModule(
             module=data["module"],
-            file=data["file"],
+            file=str(relative_file),
             doc=data.get("doc", ""),
             entries=entries,
         )
