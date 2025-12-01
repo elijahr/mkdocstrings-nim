@@ -1,8 +1,15 @@
 # mkdocstrings-nim
 
+[![PyPI](https://img.shields.io/pypi/v/mkdocstrings-nim)](https://pypi.org/project/mkdocstrings-nim/)
+[![Python](https://img.shields.io/pypi/pyversions/mkdocstrings-nim)](https://pypi.org/project/mkdocstrings-nim/)
+[![License](https://img.shields.io/github/license/elijahr/mkdocstrings-nim)](https://github.com/elijahr/mkdocstrings-nim/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-elijahr.github.io%2Fmkdocstrings--nim-blue)](https://elijahr.github.io/mkdocstrings-nim/)
+
 A [mkdocstrings](https://mkdocstrings.github.io/) handler for [Nim](https://nim-lang.org/).
 
 Parses Nim source files using the Nim compiler's AST to extract module docstrings, procedure signatures, parameter types, return types, and `{.raises.}` pragma annotations. Renders the extracted documentation as HTML within [MkDocs](https://www.mkdocs.org/) using the `::: module` directive syntax.
+
+**[Documentation](https://elijahr.github.io/mkdocstrings-nim/)**
 
 ## Installation
 
