@@ -29,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TOC integration: documented procs/types now appear in table of contents
 - Config options cascade correctly: defaults < config < directive options
 
+### Testing
+
+- Expanded test suite from 25 to 45 tests (87% coverage)
+- Added tests for config validation, git branch detection, and error handling
+- Added tests for collector edge cases (JSON extraction, module parsing)
+- Added tests for docstring edge cases (empty, malformed, multi-paragraph)
+
 ## [0.1.0] - 2025-11-30
 
 ### Added
