@@ -32,6 +32,7 @@ plugins:
 | `show_signature` | bool | `true` | Show full procedure signatures |
 | `show_pragmas` | bool | `true` | Show pragma annotations |
 | `show_private` | bool | `false` | Show non-exported (private) symbols |
+| `show_attribution` | bool | `true` | Show "Generated with mkdocstrings-nim" footer |
 | `heading_level` | int | `2` | Starting HTML heading level |
 | `source_url` | string | `null` | Base URL for source links (e.g., `https://github.com/owner/repo`) |
 | `source_ref` | string | `"main"` | Git branch or tag for source links (set to your default branch) |

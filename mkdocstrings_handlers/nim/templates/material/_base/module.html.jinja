@@ -28,5 +28,13 @@ Context:
         {% include template_name %}
       {% endwith %}
     {% endfor %}
+
+    {% if config.show_attribution %}
+    <div class="doc-attribution">
+      <small>
+        Generated with <a href="https://github.com/elijahr/mkdocstrings-nim" target="_blank" rel="noopener">mkdocstrings-nim</a>
+      </small>
+    </div>
+    {% endif %}
   </div>
 </div>

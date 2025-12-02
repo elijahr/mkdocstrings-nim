@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `show_private` option to include non-exported (private) symbols in documentation
+- `show_attribution` option with "Generated with mkdocstrings-nim" footer (enabled by default)
 - `source_url` and `source_ref` options for clickable source links to GitHub/GitLab
 - `exported` field tracking for Nim symbols (detects `*` export marker)
 - Documentation for source links, private symbols, and all handler options

@@ -66,6 +66,7 @@ class NimHandler(BaseHandler):
             "show_signature": True,
             "show_pragmas": True,
             "show_private": False,  # Hide non-exported symbols by default
+            "show_attribution": True,  # Show "Generated with mkdocstrings-nim" footer
             "heading_level": 2,
             "docstring_style": "rst",
             "source_url": None,  # e.g., "https://github.com/owner/repo"
