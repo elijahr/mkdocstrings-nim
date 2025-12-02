@@ -35,7 +35,7 @@ plugins:
 | `show_attribution` | bool | `true` | Show "Generated with mkdocstrings-nim" footer |
 | `heading_level` | int | `2` | Starting HTML heading level |
 | `source_url` | string | `null` | Base URL for source links (e.g., `https://github.com/owner/repo`) |
-| `source_ref` | string | `"main"` | Git branch or tag for source links (set to your default branch) |
+| `source_ref` | string | auto-detected | Git branch or tag for source links (auto-detected from git if not set) |
 
 ## Per-Object Options
 
@@ -72,13 +72,14 @@ handlers:
     options:
       show_source: true
       source_url: https://github.com/owner/repo
-      source_ref: devel  # your default branch name
+      # source_ref auto-detected from git branch
 ```
 
-When `source_url` is set, the source location becomes a link to the file on GitHub/GitLab at the specified ref.
+When `source_url` is set, the source location becomes a link to the file on GitHub/GitLab.
 
-- Set `source_ref` to your repository's default branch (e.g., `main`, `master`, `devel`)
-- For versioned releases, use a tag (e.g., `v1.0.0`) to link to the exact version
+- `source_ref` is **auto-detected** from your current git branch if not set
+- Override with a tag (e.g., `v1.0.0`) for versioned release documentation
+- The handler warns if `source_url` format appears incorrect
 
 ## Private Symbols
 

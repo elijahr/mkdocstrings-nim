@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+import subprocess
 from pathlib import Path
 from typing import Any, ClassVar, MutableMapping
 
@@ -11,6 +13,11 @@ from mkdocstrings_handlers.nim.collector import NimCollector, NimModule, NimEntr
 from mkdocstrings_handlers.nim.docstring import parse_docstring, DocstringStyle
 
 _logger = get_logger(__name__)
+
+# Pattern for valid source URLs (GitHub, GitLab, Bitbucket, etc.)
+_SOURCE_URL_PATTERN = re.compile(
+    r"^https?://[^/]+/[^/]+/[^/]+/?$"  # https://host/org/repo or https://host/org/repo/
+)
 
 
 class NimHandler(BaseHandler):
@@ -47,8 +54,94 @@ class NimHandler(BaseHandler):
         )
         self.paths = paths or ["src"]
         self.base_dir = base_dir
-        self.config_options = config_options or {}
+        self.config_options = self._validate_and_enhance_config(config_options or {}, base_dir)
         self.collector = NimCollector(self.paths, base_dir)
+
+    @staticmethod
+    def _detect_git_branch(base_dir: Path) -> str | None:
+        """Detect the current git branch.
+
+        Args:
+            base_dir: Directory to run git command in.
+
+        Returns:
+            Branch name or None if not in a git repo or detection fails.
+        """
+        try:
+            result = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                capture_output=True,
+                text=True,
+                cwd=base_dir,
+                timeout=5,
+            )
+            if result.returncode == 0:
+                branch = result.stdout.strip()
+                if branch and branch != "HEAD":  # HEAD means detached state
+                    return branch
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            pass
+        return None
+
+    def _validate_and_enhance_config(
+        self, config: dict[str, Any], base_dir: Path
+    ) -> dict[str, Any]:
+        """Validate configuration and auto-detect missing values.
+
+        Args:
+            config: Raw configuration options.
+            base_dir: Project base directory.
+
+        Returns:
+            Enhanced configuration with auto-detected values.
+        """
+        config = config.copy()
+        show_source = config.get("show_source", True)
+        source_url = config.get("source_url")
+        source_ref = config.get("source_ref")
+
+        # Auto-detect source_ref from git if not set
+        if source_ref is None:
+            detected_branch = self._detect_git_branch(base_dir)
+            if detected_branch:
+                config["source_ref"] = detected_branch
+                _logger.debug(f"Auto-detected source_ref: {detected_branch}")
+            else:
+                config["source_ref"] = "main"  # fallback default
+                if show_source and source_url:
+                    _logger.warning(
+                        "mkdocstrings-nim: Could not auto-detect git branch for source_ref. "
+                        "Defaulting to 'main'. Set source_ref explicitly if this is incorrect."
+                    )
+
+        # Validate source_url format
+        if source_url:
+            # Remove trailing slash for consistency
+            source_url = source_url.rstrip("/")
+            config["source_url"] = source_url
+
+            if not _SOURCE_URL_PATTERN.match(source_url + "/"):
+                _logger.warning(
+                    f"mkdocstrings-nim: source_url '{source_url}' may be malformed. "
+                    "Expected format: https://github.com/owner/repo (no trailing /blob/ or /tree/)"
+                )
+
+            # Check for common mistakes
+            if "/blob/" in source_url or "/tree/" in source_url:
+                _logger.warning(
+                    f"mkdocstrings-nim: source_url should not contain '/blob/' or '/tree/'. "
+                    f"Use the repository root URL instead: e.g., https://github.com/owner/repo"
+                )
+
+        # Warn if show_source is enabled but source_url is not set
+        elif show_source:
+            _logger.info(
+                "mkdocstrings-nim: show_source is enabled but source_url is not set. "
+                "Source locations will show file:line without clickable links. "
+                "Set source_url (e.g., https://github.com/owner/repo) to enable source links."
+            )
+
+        return config
 
     def get_options(self, local_options: MutableMapping[str, Any]) -> HandlerOptions:
         """Get combined options.
@@ -70,7 +163,7 @@ class NimHandler(BaseHandler):
             "heading_level": 2,
             "docstring_style": "rst",
             "source_url": None,  # e.g., "https://github.com/owner/repo"
-            "source_ref": "main",  # branch or tag
+            "source_ref": None,  # auto-detected from git, or set explicitly
         }
         return {**defaults, **self.config_options, **local_options}
 
