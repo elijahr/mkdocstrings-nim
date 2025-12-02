@@ -235,3 +235,48 @@ class TestEpydocDocstring:
         assert result.raises[0].type == "ValueError"
         assert result.raises[0].description == "If value is invalid"
         assert result.raises[1].type == "IOError"
+
+
+class TestEdgeCases:
+    """Tests for edge cases in docstring parsing."""
+
+    def test_empty_docstring(self):
+        """Test parsing empty docstring."""
+        result = parse_docstring("", style=DocstringStyle.RST)
+
+        assert result.description == ""
+        assert result.params == []
+        assert result.returns is None
+        assert result.raises == []
+
+    def test_whitespace_only_docstring(self):
+        """Test parsing whitespace-only docstring."""
+        result = parse_docstring("   \n\t  ", style=DocstringStyle.RST)
+
+        # Should parse as description or empty
+        assert result is not None
+
+    def test_malformed_docstring_fallback(self):
+        """Test that malformed docstrings fall back gracefully."""
+        # This is intentionally malformed
+        doc = """Description here.
+
+:param missing closing
+:returns but no colon
+:raises: no type given
+"""
+        # Should not raise, should return something reasonable
+        result = parse_docstring(doc, style=DocstringStyle.RST)
+        assert "Description" in result.description
+
+    def test_long_description(self):
+        """Test docstring with short and long description."""
+        doc = """Short description.
+
+This is a longer description that spans
+multiple lines and provides more detail.
+"""
+        result = parse_docstring(doc, style=DocstringStyle.RST)
+
+        assert "Short description" in result.description
+        assert "longer description" in result.description
