@@ -1,0 +1,32 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_call:  # Allow other workflows to call this
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install ruff mypy
+
+      - name: Run ruff check
+        run: ruff check mkdocstrings_handlers tests
+
+      - name: Run ruff format check
+        run: ruff format --check mkdocstrings_handlers tests
+
+      - name: Run mypy
+        run: mypy mkdocstrings_handlers --config-file pyproject.toml

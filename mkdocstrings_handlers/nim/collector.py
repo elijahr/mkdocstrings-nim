@@ -6,11 +6,10 @@ import json
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from importlib.resources import files, as_file
+from importlib.resources import as_file, files
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +29,7 @@ _JSON_END_MARKER = "<<MKDOCSTRINGS_JSON_END>>"
 @dataclass
 class NimParam:
     """A Nim parameter."""
+
     name: str
     type: str
     description: str = ""
@@ -38,6 +38,7 @@ class NimParam:
 @dataclass
 class NimEntry:
     """A documented Nim entry (proc, type, const, etc.)."""
+
     name: str
     kind: str
     line: int
@@ -54,6 +55,7 @@ class NimEntry:
 @dataclass
 class NimModule:
     """A documented Nim module."""
+
     module: str
     file: str
     doc: str = ""
@@ -126,49 +128,51 @@ class NimCollector:
         # Get the extractor package files
         extractor_pkg = files("mkdocstrings_handlers.nim").joinpath("extractor")
 
-        with as_file(extractor_pkg.joinpath("nimdocinfo.nim")) as src_main:
-            with as_file(extractor_pkg.joinpath("extractor.nim")) as src_extractor:
-                # Fast path: binary exists and is up-to-date
-                if cache_binary.exists():
-                    binary_mtime = cache_binary.stat().st_mtime
-                    if (src_main.stat().st_mtime <= binary_mtime and
-                            src_extractor.stat().st_mtime <= binary_mtime):
-                        return cache_binary
+        with (
+            as_file(extractor_pkg.joinpath("nimdocinfo.nim")) as src_main,
+            as_file(extractor_pkg.joinpath("extractor.nim")) as src_extractor,
+        ):
+            # Fast path: binary exists and is up-to-date
+            if cache_binary.exists():
+                binary_mtime = cache_binary.stat().st_mtime
+                if (
+                    src_main.stat().st_mtime <= binary_mtime
+                    and src_extractor.stat().st_mtime <= binary_mtime
+                ):
+                    return cache_binary
 
-                # Need to compile - use atomic rename pattern for thread safety
-                # Compile in a temp directory, then atomically rename
-                with tempfile.TemporaryDirectory(dir=_CACHE_DIR) as tmp_dir:
-                    tmp_path = Path(tmp_dir)
-                    tmp_main = tmp_path / "nimdocinfo.nim"
-                    tmp_extractor = tmp_path / "extractor.nim"
-                    tmp_binary = tmp_path / "nimdocinfo"
+            # Need to compile - use atomic rename pattern for thread safety
+            # Compile in a temp directory, then atomically rename
+            with tempfile.TemporaryDirectory(dir=_CACHE_DIR) as tmp_dir:
+                tmp_path = Path(tmp_dir)
+                tmp_main = tmp_path / "nimdocinfo.nim"
+                tmp_extractor = tmp_path / "extractor.nim"
+                tmp_binary = tmp_path / "nimdocinfo"
 
-                    # Copy source files to temp directory
-                    shutil.copy2(src_main, tmp_main)
-                    shutil.copy2(src_extractor, tmp_extractor)
+                # Copy source files to temp directory
+                shutil.copy2(src_main, tmp_main)
+                shutil.copy2(src_extractor, tmp_extractor)
 
-                    # Compile in temp directory
-                    result = subprocess.run(
-                        ["nim", "c", f"--outdir:{tmp_path}", str(tmp_main)],
-                        capture_output=True,
-                        text=True,
-                        timeout=120,  # First compile can be slow
-                    )
+                # Compile in temp directory
+                result = subprocess.run(
+                    ["nim", "c", f"--outdir:{tmp_path}", str(tmp_main)],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,  # First compile can be slow
+                )
 
-                    if result.returncode != 0:
-                        raise CollectionError(
-                            f"Failed to compile nimdocinfo:\n{result.stderr}"
-                        )
+                if result.returncode != 0:
+                    raise CollectionError(f"Failed to compile nimdocinfo:\n{result.stderr}")
 
-                    # Atomic rename - if another process won the race, that's fine
-                    try:
-                        os.replace(tmp_binary, cache_binary)
-                    except OSError:
-                        # Another process may have beat us - check if binary exists
-                        if not cache_binary.exists():
-                            raise
+                # Atomic rename - if another process won the race, that's fine
+                try:
+                    os.replace(tmp_binary, cache_binary)
+                except OSError:
+                    # Another process may have beat us - check if binary exists
+                    if not cache_binary.exists():
+                        raise
 
-                return cache_binary
+            return cache_binary
 
     def _extract_json(self, stdout: str, filepath: Path) -> dict[str, Any]:
         """Extract JSON from stdout using sentinel markers.
@@ -196,12 +200,13 @@ class NimCollector:
                 f"Output was:\n{preview}"
             )
 
-        json_str = stdout[start_idx + len(_JSON_START_MARKER):end_idx].strip()
+        json_str = stdout[start_idx + len(_JSON_START_MARKER) : end_idx].strip()
 
         try:
-            return json.loads(json_str)
+            result: dict[str, Any] = json.loads(json_str)
+            return result
         except json.JSONDecodeError as e:
-            raise CollectionError(f"Invalid JSON from nimdocinfo: {e}")
+            raise CollectionError(f"Invalid JSON from nimdocinfo: {e}") from e
 
     def _run_nimdocinfo(self, filepath: Path) -> dict[str, Any]:
         """Run nimdocinfo on a Nim file.
@@ -236,16 +241,16 @@ class NimCollector:
             # Extract JSON using sentinel markers
             return self._extract_json(result.stdout, filepath)
 
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             raise CollectionError(
                 "Nim compiler not found. Install from https://nim-lang.org/install.html\n"
                 "Then verify installation: nim --version"
-            )
-        except subprocess.TimeoutExpired:
+            ) from e
+        except subprocess.TimeoutExpired as e:
             raise CollectionError(
                 f"nimdocinfo timed out processing {filepath}. "
                 "The file may be too complex or have circular imports."
-            )
+            ) from e
 
     def _parse_module(self, data: dict[str, Any]) -> NimModule:
         """Parse JSON data into NimModule.
@@ -280,22 +285,23 @@ class NimCollector:
                 )
 
             params = [
-                NimParam(name=p["name"], type=p["type"])
-                for p in entry_data.get("params", [])
+                NimParam(name=p["name"], type=p["type"]) for p in entry_data.get("params", [])
             ]
 
-            entries.append(NimEntry(
-                name=entry_data["name"],
-                kind=entry_data["kind"],
-                line=entry_data["line"],
-                signature=entry_data["signature"],
-                doc=entry_data.get("doc", ""),
-                params=params,
-                returns=entry_data.get("returns", ""),
-                pragmas=entry_data.get("pragmas", []),
-                raises=entry_data.get("raises", []),
-                exported=entry_data.get("exported", True),
-            ))
+            entries.append(
+                NimEntry(
+                    name=entry_data["name"],
+                    kind=entry_data["kind"],
+                    line=entry_data["line"],
+                    signature=entry_data["signature"],
+                    doc=entry_data.get("doc", ""),
+                    params=params,
+                    returns=entry_data.get("returns", ""),
+                    pragmas=entry_data.get("pragmas", []),
+                    raises=entry_data.get("raises", []),
+                    exported=entry_data.get("exported", True),
+                )
+            )
 
         # Make file path relative to base_dir for source links
         file_path = Path(data["file"])

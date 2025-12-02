@@ -1,17 +1,17 @@
 """Nim handler for mkdocstrings."""
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
-from mkdocstrings_handlers.nim.handler import NimHandler, get_handler
-from mkdocstrings_handlers.nim.collector import NimCollector, NimModule, NimEntry, NimParam
+from mkdocstrings_handlers.nim.collector import NimCollector, NimEntry, NimModule, NimParam
 from mkdocstrings_handlers.nim.docstring import (
-    parse_docstring,
     DocstringStyle,
-    ParsedDocstring,
     ParamDoc,
-    ReturnsDoc,
+    ParsedDocstring,
     RaisesDoc,
+    ReturnsDoc,
+    parse_docstring,
 )
+from mkdocstrings_handlers.nim.handler import NimHandler, get_handler
 
 try:
     __version__ = version("mkdocstrings-nim")

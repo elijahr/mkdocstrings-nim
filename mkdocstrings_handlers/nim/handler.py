@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import re
 import subprocess
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
-from typing import Any, ClassVar, MutableMapping
+from typing import Any, ClassVar
 
 from mkdocstrings import BaseHandler, CollectorItem, HandlerOptions, get_logger
 
-from mkdocstrings_handlers.nim.collector import NimCollector, NimModule, NimEntry
-from mkdocstrings_handlers.nim.docstring import parse_docstring, DocstringStyle
+from mkdocstrings_handlers.nim.collector import NimCollector, NimEntry, NimModule
+from mkdocstrings_handlers.nim.docstring import DocstringStyle, parse_docstring
 
 _logger = get_logger(__name__)
 
@@ -129,8 +130,8 @@ class NimHandler(BaseHandler):
             # Check for common mistakes
             if "/blob/" in source_url or "/tree/" in source_url:
                 _logger.warning(
-                    f"mkdocstrings-nim: source_url should not contain '/blob/' or '/tree/'. "
-                    f"Use the repository root URL instead: e.g., https://github.com/owner/repo"
+                    "mkdocstrings-nim: source_url should not contain '/blob/' or '/tree/'. "
+                    "Use the repository root URL instead: e.g., https://github.com/owner/repo"
                 )
 
         # Warn if show_source is enabled but source_url is not set
@@ -143,7 +144,7 @@ class NimHandler(BaseHandler):
 
         return config
 
-    def get_options(self, local_options: MutableMapping[str, Any]) -> HandlerOptions:
+    def get_options(self, local_options: Mapping[str, Any]) -> HandlerOptions:
         """Get combined options.
 
         Merges defaults < config options < directive options (local_options).
@@ -223,7 +224,13 @@ class NimHandler(BaseHandler):
 
         return module
 
-    def render(self, data: CollectorItem, options: HandlerOptions) -> str:
+    def render(
+        self,
+        data: CollectorItem,
+        options: HandlerOptions,
+        *,
+        locale: str | None = None,  # noqa: ARG002
+    ) -> str:
         """Render collected data to HTML.
 
         Args:

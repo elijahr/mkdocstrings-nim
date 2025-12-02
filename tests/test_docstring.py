@@ -1,7 +1,6 @@
 """Tests for docstring parsing."""
 
-import pytest
-from mkdocstrings_handlers.nim.docstring import parse_docstring, DocstringStyle
+from mkdocstrings_handlers.nim.docstring import DocstringStyle, parse_docstring
 
 
 class TestRstDocstring:

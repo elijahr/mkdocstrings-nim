@@ -1,10 +1,9 @@
 """Tests for the Nim handler."""
 
-import pytest
 from pathlib import Path
 
-from mkdocstrings_handlers.nim.handler import NimHandler, get_handler
-from mkdocstrings_handlers.nim.collector import NimCollector, NimModule
+from mkdocstrings_handlers.nim.collector import NimCollector
+from mkdocstrings_handlers.nim.handler import NimHandler
 
 
 class TestNimCollector:
@@ -67,6 +66,7 @@ class TestNimHandler:
 def test_invalid_docstring_style_fallback(tmp_path, caplog):
     """Test that invalid docstring_style falls back to RST with warning."""
     import logging
+
     from mkdocstrings_handlers.nim.handler import NimHandler
 
     handler = NimHandler(paths=["src"], base_dir=tmp_path, mdx=[], mdx_config={})
@@ -76,7 +76,7 @@ def test_invalid_docstring_style_fallback(tmp_path, caplog):
     # We need a minimal Nim file to test collect()
     nim_file = tmp_path / "src" / "test.nim"
     nim_file.parent.mkdir(parents=True, exist_ok=True)
-    nim_file.write_text('proc foo*() = discard\n')
+    nim_file.write_text("proc foo*() = discard\n")
 
     with caplog.at_level(logging.WARNING):
         # Should not raise ValueError
@@ -102,8 +102,12 @@ class TestConfigValidation:
             ["git", "commit", "-m", "init", "--author", "Test <test@test.com>"],
             cwd=tmp_path,
             capture_output=True,
-            env={"GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@test.com",
-                 "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@test.com"},
+            env={
+                "GIT_AUTHOR_NAME": "Test",
+                "GIT_AUTHOR_EMAIL": "test@test.com",
+                "GIT_COMMITTER_NAME": "Test",
+                "GIT_COMMITTER_EMAIL": "test@test.com",
+            },
         )
 
         branch = NimHandler._detect_git_branch(tmp_path)
@@ -116,11 +120,16 @@ class TestConfigValidation:
 
     def _init_git_repo(self, tmp_path, branch="main"):
         """Helper to initialize a git repo with a commit."""
-        import subprocess
         import os
+        import subprocess
 
-        env = {**os.environ, "GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@test.com",
-               "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@test.com"}
+        env = {
+            **os.environ,
+            "GIT_AUTHOR_NAME": "Test",
+            "GIT_AUTHOR_EMAIL": "test@test.com",
+            "GIT_COMMITTER_NAME": "Test",
+            "GIT_COMMITTER_EMAIL": "test@test.com",
+        }
         subprocess.run(["git", "init", "-b", branch], cwd=tmp_path, capture_output=True)
         (tmp_path / "README.md").write_text("test")
         subprocess.run(["git", "add", "."], cwd=tmp_path, capture_output=True)

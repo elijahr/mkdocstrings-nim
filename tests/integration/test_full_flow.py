@@ -22,17 +22,19 @@ The Python tests cover:
 - Error handling for invalid inputs
 """
 
-import pytest
 from pathlib import Path
-from mkdocstrings_handlers.nim.handler import get_handler
-from mkdocstrings_handlers.nim.collector import NimModule
 
+import pytest
+
+from mkdocstrings_handlers.nim.collector import NimModule
+from mkdocstrings_handlers.nim.handler import get_handler
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "sample_project"
 
 
 class MockToolConfig:
     """Mock MkDocs tool config."""
+
     config_file_path = str(FIXTURE_DIR / "mkdocs.yml")
 
 
@@ -51,8 +53,7 @@ class TestFullFlow:
     """End-to-end tests."""
 
     @pytest.mark.skipif(
-        not (FIXTURE_DIR / "src" / "mylib.nim").exists(),
-        reason="Fixture not found"
+        not (FIXTURE_DIR / "src" / "mylib.nim").exists(), reason="Fixture not found"
     )
     def test_collect_module(self, handler):
         """Test collecting a full module."""
@@ -71,8 +72,7 @@ class TestFullFlow:
         assert "process" in entry_names
 
     @pytest.mark.skipif(
-        not (FIXTURE_DIR / "src" / "mylib.nim").exists(),
-        reason="Fixture not found"
+        not (FIXTURE_DIR / "src" / "mylib.nim").exists(), reason="Fixture not found"
     )
     def test_collect_parses_docstrings(self, handler):
         """Test that docstrings are parsed for parameter descriptions."""
@@ -88,20 +88,20 @@ class TestFullFlow:
         assert initialize.returns_doc == "True if successful"
 
     @pytest.mark.skipif(
-        not (FIXTURE_DIR / "src" / "mylib.nim").exists(),
-        reason="Fixture not found"
+        not (FIXTURE_DIR / "src" / "mylib.nim").exists(), reason="Fixture not found"
     )
     def test_render_module(self, handler):
         """Test rendering a module to HTML."""
         # Mock the convert_markdown filter to return input unchanged
         # This allows testing template rendering without full MkDocs infrastructure
-        handler.env.filters["convert_markdown"] = lambda text, *args, **kwargs: text
+        handler.env.filters["convert_markdown"] = lambda text, *_args, **_kwargs: text
 
         # Mock the heading filter to just wrap content in a heading tag
         def mock_heading(text, level, **kwargs):
             html_id = kwargs.get("id", "")
             html_class = kwargs.get("class", "")
             return f'<h{level} id="{html_id}" class="{html_class}">{text}</h{level}>'
+
         handler.env.filters["heading"] = mock_heading
 
         options = handler.get_options({})

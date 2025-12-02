@@ -6,7 +6,16 @@ on:
       - 'v*'
 
 jobs:
+  # Run tests before publishing
+  test:
+    uses: ./.github/workflows/test.yml
+
+  # Run linting before publishing
+  lint:
+    uses: ./.github/workflows/lint.yml
+
   publish:
+    needs: [test, lint]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:

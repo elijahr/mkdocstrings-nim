@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 import docstring_parser
-from docstring_parser import DocstringStyle as DPStyle, ParseError
+from docstring_parser import DocstringStyle as DPStyle
+from docstring_parser import ParseError
 from mkdocstrings import get_logger
 
 _logger = get_logger(__name__)
@@ -15,6 +15,7 @@ _logger = get_logger(__name__)
 
 class DocstringStyle(Enum):
     """Supported docstring styles."""
+
     RST = "rst"
     GOOGLE = "google"
     NUMPY = "numpy"
@@ -25,6 +26,7 @@ class DocstringStyle(Enum):
 @dataclass
 class ParamDoc:
     """Parsed parameter documentation."""
+
     name: str
     description: str = ""
     type: str = ""
@@ -33,6 +35,7 @@ class ParamDoc:
 @dataclass
 class ReturnsDoc:
     """Parsed return value documentation."""
+
     description: str = ""
     type: str = ""
 
@@ -40,6 +43,7 @@ class ReturnsDoc:
 @dataclass
 class RaisesDoc:
     """Parsed raises documentation."""
+
     type: str
     description: str = ""
 
@@ -47,9 +51,10 @@ class RaisesDoc:
 @dataclass
 class ParsedDocstring:
     """Parsed docstring with structured sections."""
+
     description: str = ""
     params: list[ParamDoc] = field(default_factory=list)
-    returns: Optional[ReturnsDoc] = None
+    returns: ReturnsDoc | None = None
     raises: list[RaisesDoc] = field(default_factory=list)
     examples: list[str] = field(default_factory=list)
 
@@ -106,11 +111,13 @@ def parse_docstring(doc: str, style: DocstringStyle = DocstringStyle.RST) -> Par
 
     # Extract parameters
     for param in parsed.params:
-        result.params.append(ParamDoc(
-            name=param.arg_name,
-            description=param.description or "",
-            type=param.type_name or "",
-        ))
+        result.params.append(
+            ParamDoc(
+                name=param.arg_name,
+                description=param.description or "",
+                type=param.type_name or "",
+            )
+        )
 
     # Extract returns
     if parsed.returns:
@@ -121,10 +128,12 @@ def parse_docstring(doc: str, style: DocstringStyle = DocstringStyle.RST) -> Par
 
     # Extract raises
     for raises in parsed.raises:
-        result.raises.append(RaisesDoc(
-            type=raises.type_name or "",
-            description=raises.description or "",
-        ))
+        result.raises.append(
+            RaisesDoc(
+                type=raises.type_name or "",
+                description=raises.description or "",
+            )
+        )
 
     # Extract examples
     for example in parsed.examples:

@@ -14,7 +14,16 @@ permissions:
   id-token: write
 
 jobs:
+  # Run tests before deploying docs
+  test:
+    uses: ./.github/workflows/test.yml
+
+  # Run linting before deploying docs
+  lint:
+    uses: ./.github/workflows/lint.yml
+
   deploy:
+    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,9 +1,12 @@
 """Tests for collector path resolution."""
-import pytest
-from pathlib import Path
+
 from importlib.resources import as_file
+from pathlib import Path
+
+import pytest
 from mkdocstrings import CollectionError
-from mkdocstrings_handlers.nim.collector import NimCollector, _JSON_START_MARKER, _JSON_END_MARKER
+
+from mkdocstrings_handlers.nim.collector import _JSON_END_MARKER, _JSON_START_MARKER, NimCollector
 
 
 def test_nimdocinfo_path_exists():
@@ -64,7 +67,7 @@ class TestExtractJson:
     def test_extract_json_invalid_json(self, tmp_path):
         """Test error when JSON is invalid."""
         collector = NimCollector(["src"], tmp_path)
-        stdout = f'{_JSON_START_MARKER}{{invalid json}}{_JSON_END_MARKER}'
+        stdout = f"{_JSON_START_MARKER}{{invalid json}}{_JSON_END_MARKER}"
 
         with pytest.raises(CollectionError, match="Invalid JSON"):
             collector._extract_json(stdout, Path("test.nim"))
@@ -87,7 +90,7 @@ class TestParseModule:
         data = {
             "module": "test",
             "file": "test.nim",
-            "entries": [{"name": "foo"}]  # Missing kind, line, signature
+            "entries": [{"name": "foo"}],  # Missing kind, line, signature
         }
 
         with pytest.raises(CollectionError, match="Entry 0 missing required fields"):
@@ -100,18 +103,20 @@ class TestParseModule:
             "module": "test",
             "file": str(tmp_path / "test.nim"),
             "doc": "Module doc",
-            "entries": [{
-                "name": "foo",
-                "kind": "proc",
-                "line": 10,
-                "signature": "proc foo()",
-                "doc": "Proc doc",
-                "params": [{"name": "x", "type": "int"}],
-                "returns": "string",
-                "pragmas": ["inline"],
-                "raises": ["ValueError"],
-                "exported": True,
-            }]
+            "entries": [
+                {
+                    "name": "foo",
+                    "kind": "proc",
+                    "line": 10,
+                    "signature": "proc foo()",
+                    "doc": "Proc doc",
+                    "params": [{"name": "x", "type": "int"}],
+                    "returns": "string",
+                    "pragmas": ["inline"],
+                    "raises": ["ValueError"],
+                    "exported": True,
+                }
+            ],
         }
 
         module = collector._parse_module(data)
