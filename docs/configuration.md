@@ -16,7 +16,10 @@ plugins:
             show_source: true
             show_signature: true
             show_pragmas: true
+            show_private: false
             heading_level: 2
+            source_url: https://github.com/owner/repo
+            source_ref: main
 ```
 
 ### Options Reference
@@ -25,10 +28,13 @@ plugins:
 |--------|------|---------|-------------|
 | `paths` | list | `["src"]` | Directories to search for Nim source files |
 | `docstring_style` | string | `"rst"` | Docstring format: `rst`, `google`, `numpy`, `epydoc`, or `auto` |
-| `show_source` | bool | `true` | Show source file line numbers |
+| `show_source` | bool | `true` | Show source file and line number for each entry |
 | `show_signature` | bool | `true` | Show full procedure signatures |
 | `show_pragmas` | bool | `true` | Show pragma annotations |
+| `show_private` | bool | `false` | Show non-exported (private) symbols |
 | `heading_level` | int | `2` | Starting HTML heading level |
+| `source_url` | string | `null` | Base URL for source links (e.g., `https://github.com/owner/repo`) |
+| `source_ref` | string | `"main"` | Git branch or tag for source links (set to your default branch) |
 
 ## Per-Object Options
 
@@ -52,6 +58,45 @@ handlers:
       - src
       - lib
       - vendor/nimble
+```
+
+## Source Links
+
+Enable clickable links to source code on GitHub or GitLab:
+
+```yaml
+handlers:
+  nim:
+    paths: [src]
+    options:
+      show_source: true
+      source_url: https://github.com/owner/repo
+      source_ref: devel  # your default branch name
+```
+
+When `source_url` is set, the source location becomes a link to the file on GitHub/GitLab at the specified ref.
+
+- Set `source_ref` to your repository's default branch (e.g., `main`, `master`, `devel`)
+- For versioned releases, use a tag (e.g., `v1.0.0`) to link to the exact version
+
+## Private Symbols
+
+By default, only exported symbols (marked with `*` in Nim) are documented. To include private symbols:
+
+```yaml
+handlers:
+  nim:
+    paths: [src]
+    options:
+      show_private: true
+```
+
+Override per-module to show private symbols for internal documentation:
+
+```markdown
+::: mymodule.internal
+    options:
+      show_private: true
 ```
 
 ## Docstring Styles

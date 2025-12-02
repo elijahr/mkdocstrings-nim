@@ -48,6 +48,7 @@ class NimEntry:
     returns_doc: str = ""
     pragmas: list[str] = field(default_factory=list)
     raises: list[str] = field(default_factory=list)
+    exported: bool = True  # True if symbol has * (public API)
 
 
 @dataclass
@@ -71,7 +72,7 @@ class NimCollector:
         """
         self.paths = paths
         self.base_dir = base_dir
-        self._cache: OrderedDict[str, NimModule] = OrderedDict()
+        self._cache: OrderedDict[str, tuple[float, NimModule]] = OrderedDict()
         # Use importlib.resources for reliable path resolution
         extractor_files = files("mkdocstrings_handlers.nim").joinpath("extractor")
         self._nimdocinfo_source = extractor_files.joinpath("nimdocinfo.nim")
@@ -293,6 +294,7 @@ class NimCollector:
                 returns=entry_data.get("returns", ""),
                 pragmas=entry_data.get("pragmas", []),
                 raises=entry_data.get("raises", []),
+                exported=entry_data.get("exported", True),
             ))
 
         # Make file path relative to base_dir for source links
@@ -314,7 +316,8 @@ class NimCollector:
         """Collect documentation for a module identifier.
 
         Uses LRU cache to avoid re-parsing modules. Cache is bounded
-        to _MAX_CACHE_SIZE entries.
+        to _MAX_CACHE_SIZE entries. Cache entries are invalidated when
+        the source file is modified.
 
         Args:
             identifier: Module identifier like 'lockfreequeues.ops'
@@ -322,12 +325,18 @@ class NimCollector:
         Returns:
             NimModule with documentation.
         """
-        if identifier in self._cache:
-            # Move to end for LRU behavior
-            self._cache.move_to_end(identifier)
-            return self._cache[identifier]
-
         filepath = self._resolve_identifier(identifier)
+        current_mtime = filepath.stat().st_mtime
+
+        if identifier in self._cache:
+            cached_mtime, cached_module = self._cache[identifier]
+            if cached_mtime == current_mtime:
+                # Move to end for LRU behavior
+                self._cache.move_to_end(identifier)
+                return cached_module
+            # File changed, remove stale entry
+            del self._cache[identifier]
+
         data = self._run_nimdocinfo(filepath)
         module = self._parse_module(data)
 
@@ -335,5 +344,5 @@ class NimCollector:
         while len(self._cache) >= _MAX_CACHE_SIZE:
             self._cache.popitem(last=False)
 
-        self._cache[identifier] = module
+        self._cache[identifier] = (current_mtime, module)
         return module

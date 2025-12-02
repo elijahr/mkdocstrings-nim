@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `show_private` option to include non-exported (private) symbols in documentation
+- `source_url` and `source_ref` options for clickable source links to GitHub/GitLab
+- `exported` field tracking for Nim symbols (detects `*` export marker)
+- Documentation for source links, private symbols, and all handler options
+
+### Changed
+
+- Cache now invalidates when source files are modified (fixes live reload with `mkdocs serve`)
+- Documented objects now appear in right-side TOC using mkdocstrings heading filter
+- Handler options from `mkdocs.yml` are now properly applied
+
+### Fixed
+
+- Live reload now works correctly when Nim source files change
+- TOC integration: documented procs/types now appear in table of contents
+- Config options cascade correctly: defaults < config < directive options
+
 ## [0.1.0] - 2025-11-30
 
 ### Added

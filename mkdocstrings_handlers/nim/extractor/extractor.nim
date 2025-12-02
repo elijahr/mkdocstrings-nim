@@ -13,6 +13,7 @@ type
     pragmas*: seq[string]
     raises*: seq[string]
     doc*: string
+    exported*: bool  ## True if symbol has * (public API)
 
   ModuleDoc* = object
     module*: string
@@ -104,6 +105,10 @@ proc renderSignature(n: PNode, kind: string, name: string): string =
     if ret.len > 0:
       result &= ": " & ret
 
+proc isExported(n: PNode): bool =
+  ## Check if a name node represents an exported symbol (has *)
+  n.kind == nkPostfix
+
 proc extractName(n: PNode): string =
   ## Extract name from a name node (handles postfix for exported symbols)
   if n.kind == nkIdent:
@@ -134,6 +139,7 @@ proc extractProc(n: PNode, kind: string): DocEntry =
   result.kind = kind
   result.line = n.info.line.int
   result.doc = extractProcDoc(n)
+  result.exported = isExported(n[routineNameIdx])
 
   if n.len > routineParamsIdx:
     result.params = extractParams(n[routineParamsIdx])
@@ -152,6 +158,7 @@ proc extractType(n: PNode): DocEntry =
   result.doc = extractDocComment(n)
   result.line = n.info.line.int
   result.name = extractName(n[0])
+  result.exported = isExported(n[0])
   result.signature = "type " & result.name
 
 proc extractConst(n: PNode): DocEntry =
@@ -160,6 +167,7 @@ proc extractConst(n: PNode): DocEntry =
   result.doc = extractDocComment(n)
   result.line = n.info.line.int
   result.name = extractName(n[0])
+  result.exported = isExported(n[0])
   result.signature = "const " & result.name
 
 proc walkAst(n: PNode, entries: var seq[DocEntry]) =
@@ -226,7 +234,8 @@ proc toJson*(doc: ModuleDoc): JsonNode =
       "kind": entry.kind,
       "line": entry.line,
       "signature": entry.signature,
-      "doc": entry.doc
+      "doc": entry.doc,
+      "exported": entry.exported
     }
 
     if entry.params.len > 0:

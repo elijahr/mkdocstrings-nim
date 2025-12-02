@@ -65,6 +65,7 @@ class NimHandler(BaseHandler):
             "show_source": True,
             "show_signature": True,
             "show_pragmas": True,
+            "show_private": False,  # Hide non-exported symbols by default
             "heading_level": 2,
             "docstring_style": "rst",
             "source_url": None,  # e.g., "https://github.com/owner/repo"
@@ -107,6 +108,11 @@ class NimHandler(BaseHandler):
         """
         _logger.debug(f"Collecting {identifier}")
         module = self.collector.collect(identifier)
+
+        # Filter non-exported entries unless show_private is True
+        show_private = options.get("show_private", False)
+        if not show_private:
+            module.entries = [e for e in module.entries if e.exported]
 
         # Parse docstrings with configured style
         style_str = options.get("docstring_style", "rst")
