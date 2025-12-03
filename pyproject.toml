@@ -26,6 +26,11 @@ classifiers = [
     "Topic :: Software Development :: Documentation",
     "Typing :: Typed",
 ]
+dependencies = [
+    "mkdocstrings>=0.20",
+    "Jinja2>=3.0",
+    "docstring-parser>=0.15",
+]
 
 [project.urls]
 Homepage = "https://github.com/elijahr/mkdocstrings-nim"
@@ -33,12 +38,6 @@ Documentation = "https://elijahr.github.io/mkdocstrings-nim/"
 Repository = "https://github.com/elijahr/mkdocstrings-nim"
 Issues = "https://github.com/elijahr/mkdocstrings-nim/issues"
 Changelog = "https://github.com/elijahr/mkdocstrings-nim/blob/main/CHANGELOG.md"
-
-dependencies = [
-    "mkdocstrings>=0.20",
-    "Jinja2>=3.0",
-    "docstring-parser>=0.15",
-]
 
 [project.optional-dependencies]
 dev = [
