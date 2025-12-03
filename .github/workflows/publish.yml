@@ -20,6 +20,7 @@ jobs:
     environment: pypi
     permissions:
       id-token: write
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,3 +40,24 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          # Extract the changelog section for this version
+          # Matches from "## [X.Y.Z]" until the next "## [" or end of file
+          NOTES=$(awk "/^## \[${VERSION}\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+          # Handle multi-line output for GitHub Actions
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ${{ steps.changelog.outputs.notes }}
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md
+          files: dist/*
