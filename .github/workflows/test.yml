@@ -26,7 +26,7 @@ jobs:
         uses: asdf-vm/actions/install@v4
         with:
           tool_versions: |
-            nim latest:stable
+            nim latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
