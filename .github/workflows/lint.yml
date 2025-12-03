@@ -20,7 +20,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install ruff mypy
+        run: pip install ruff mypy mkdocstrings jinja2 docstring-parser
 
       - name: Run ruff check
         run: ruff check mkdocstrings_handlers tests
