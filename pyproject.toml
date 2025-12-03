@@ -12,7 +12,9 @@ requires-python = ">=3.9"
 authors = [
     { name = "Elijah Rutschman" }
 ]
+keywords = ["mkdocstrings", "nim", "documentation", "mkdocs", "api-docs"]
 classifiers = [
+    "License :: OSI Approved :: MIT License",
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
@@ -22,7 +24,16 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Documentation",
     "Topic :: Software Development :: Documentation",
+    "Typing :: Typed",
 ]
+
+[project.urls]
+Homepage = "https://github.com/elijahr/mkdocstrings-nim"
+Documentation = "https://elijahr.github.io/mkdocstrings-nim/"
+Repository = "https://github.com/elijahr/mkdocstrings-nim"
+Issues = "https://github.com/elijahr/mkdocstrings-nim/issues"
+Changelog = "https://github.com/elijahr/mkdocstrings-nim/blob/main/CHANGELOG.md"
+
 dependencies = [
     "mkdocstrings>=0.20",
     "Jinja2>=3.0",
