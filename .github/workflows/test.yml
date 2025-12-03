@@ -22,11 +22,16 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup Nim
-        uses: asdf-vm/actions/install@v4
-        with:
-          tool_versions: |
-            nim latest:2
+      - name: Setup asdf
+        uses: asdf-vm/actions/setup@v4
+
+      - name: Install asdf-nim plugin
+        run: asdf plugin add nim
+
+      - name: Install Nim
+        run: |
+          asdf install nim latest:2
+          asdf set nim latest:2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
