@@ -23,9 +23,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Setup Nim
-        uses: iffy/install-nim@v5
+        uses: asdf-vm/actions/install@v4
         with:
-          version: binary:stable
+          tool_versions: |
+            nim latest:stable
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
