@@ -154,21 +154,100 @@ proc extractProc(n: PNode, kind: string): DocEntry =
 
 proc extractType(n: PNode): DocEntry =
   ## Extract documentation from a type definition
+  ## nkTypeDef structure: [name, genericParams, typeImpl]
   result.kind = "type"
   result.doc = extractDocComment(n)
   result.line = n.info.line.int
   result.name = extractName(n[0])
   result.exported = isExported(n[0])
-  result.signature = "type " & result.name
+
+  # Build full signature with type definition
+  var sig = "type " & result.name
+
+  # Add generic params if present (index 1)
+  if n.len > 1 and n[1].kind != nkEmpty:
+    sig &= $n[1]
+
+  # Add type implementation (index 2)
+  if n.len > 2 and n[2].kind != nkEmpty:
+    sig &= " = " & $n[2]
+
+  result.signature = sig
 
 proc extractConst(n: PNode): DocEntry =
   ## Extract documentation from a const definition
+  ## nkConstDef structure: [name, type, value]
   result.kind = "const"
   result.doc = extractDocComment(n)
   result.line = n.info.line.int
   result.name = extractName(n[0])
   result.exported = isExported(n[0])
-  result.signature = "const " & result.name
+
+  # Build full signature with type and value
+  var sig = "const " & result.name
+
+  # Add type if present (index 1)
+  if n.len > 1 and n[1].kind != nkEmpty:
+    sig &= ": " & $n[1]
+
+  # Add value if present (index 2)
+  if n.len > 2 and n[2].kind != nkEmpty:
+    sig &= " = " & $n[2]
+
+  result.signature = sig
+
+  # Store return type for consistency
+  if n.len > 1 and n[1].kind != nkEmpty:
+    result.returns = $n[1]
+
+proc extractVarName(n: PNode): tuple[name: string, exported: bool, pragmas: seq[string]] =
+  ## Extract name, export status, and pragmas from a var/let name node
+  ## Handles: nkIdent, nkPostfix, nkPragmaExpr
+  result.pragmas = @[]
+
+  if n.kind == nkIdent:
+    result.name = $n.ident.s
+    result.exported = false
+  elif n.kind == nkPostfix and n.len >= 2:
+    result.name = extractName(n)
+    result.exported = true
+  elif n.kind == nkPragmaExpr and n.len >= 2:
+    # nkPragmaExpr: [name, nkPragma]
+    let (innerName, innerExported, _) = extractVarName(n[0])
+    result.name = innerName
+    result.exported = innerExported
+    if n[1].kind == nkPragma:
+      result.pragmas = extractPragmas(n[1])
+  else:
+    result.name = ""
+    result.exported = false
+
+proc extractVar(n: PNode, kind: string): DocEntry =
+  ## Extract documentation from a var/let definition
+  ## nkIdentDefs structure: [name(s), type, value]
+  result.kind = kind
+  result.doc = extractDocComment(n)
+  result.line = n.info.line.int
+
+  # Extract name with potential pragmas
+  let (name, exported, pragmas) = extractVarName(n[0])
+  result.name = name
+  result.exported = exported
+  result.pragmas = pragmas
+
+  # Build full signature
+  var sig = kind & " " & result.name
+
+  # Add type if present (second to last element)
+  if n.len >= 2 and n[^2].kind != nkEmpty:
+    sig &= ": " & $n[^2]
+    result.returns = $n[^2]
+
+  # Add value if present (last element)
+  if n.len >= 1 and n[^1].kind != nkEmpty:
+    sig &= " = " & $n[^1]
+
+  result.signature = sig
 
 proc walkAst(n: PNode, entries: var seq[DocEntry]) =
   ## Walk AST and collect documentation entries
@@ -190,6 +269,16 @@ proc walkAst(n: PNode, entries: var seq[DocEntry]) =
     entries.add extractType(n)
   of nkConstDef:
     entries.add extractConst(n)
+  of nkVarSection:
+    # var section contains nkIdentDefs
+    for child in n:
+      if child.kind == nkIdentDefs:
+        entries.add extractVar(child, "var")
+  of nkLetSection:
+    # let section contains nkIdentDefs
+    for child in n:
+      if child.kind == nkIdentDefs:
+        entries.add extractVar(child, "let")
   else:
     for child in n:
       walkAst(child, entries)
