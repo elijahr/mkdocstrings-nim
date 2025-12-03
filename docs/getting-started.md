@@ -1,58 +1,95 @@
 # Getting Started
 
-## Installation
+This guide gets you from zero to a running documentation server for your Nim project.
 
-```bash
-pip install mkdocstrings-nim
-```
+## Prerequisites
 
-Ensure the Nim compiler is installed and available in your PATH:
+- **Nim** compiler installed and in PATH ([install Nim](https://nim-lang.org/install.html))
+- **Python 3.9+** ([install Python](https://www.python.org/downloads/))
+
+Verify Nim is installed:
 
 ```bash
 nim --version
 ```
 
-If not installed, see [nim-lang.org/install](https://nim-lang.org/install.html).
+## 1. Install the tools
 
-## Basic Setup
+```bash
+pip install mkdocs mkdocs-material mkdocstrings-nim
+```
 
-### 1. Configure MkDocs
+## 2. Create mkdocs.yml
 
-Add mkdocstrings with the Nim handler to your `mkdocs.yml`:
+In your Nim project root, create `mkdocs.yml`:
 
 ```yaml
+site_name: My Nim Project
+theme:
+  name: material
+
 plugins:
   - search
   - mkdocstrings:
-      default_handler: nim
       handlers:
         nim:
-          paths: [src]
+          paths: [src]  # Where your .nim files are
           options:
+            show_source: true
+            docstring_style: rst
             heading_level: 3  # Recommended for TOC integration
-```
 
-For the right-side table of contents to include API items, also configure:
-
-```yaml
 markdown_extensions:
   - toc:
       permalink: true
       toc_depth: 4  # Include h2, h3, h4 in TOC
+
+watch:
+  - docs
+  - src  # Reload when Nim source files change
 ```
 
-### 2. Write Documented Nim Code
+## 3. Create your docs
 
-Create a Nim module with docstrings:
+Create a `docs/` directory with documentation files:
 
+```bash
+mkdir docs
+```
+
+**docs/index.md:**
+```markdown
+# My Nim Project
+
+Welcome to my project documentation.
+
+## API Reference
+
+::: mymodule
+```
+
+The `::: mymodule` directive tells mkdocstrings to extract and render documentation from `src/mymodule.nim`.
+
+## 4. Write documented Nim code
+
+Create a Nim module with docstrings using `##` comments:
+
+**src/mymodule.nim:**
 ```nim
-## mylib.nim - A sample library.
+## This module provides greeting utilities.
 
 type
   Config* = object
     ## Configuration settings.
-    name*: string
-    debug*: bool
+    name*: string  ## The name to use
+    debug*: bool   ## Enable debug mode
+
+proc greet*(name: string): string =
+  ## Greet someone by name.
+  ##
+  ## :param name: The name to greet
+  ## :returns: A greeting message
+  result = "Hello, " & name & "!"
 
 proc init*(cfg: Config): bool =
   ## Initialize the library.
@@ -62,32 +99,21 @@ proc init*(cfg: Config): bool =
   result = true
 ```
 
-### 3. Reference in Markdown
-
-Create `docs/api.md`:
-
-```markdown
-# API Reference
-
-::: mylib
-```
-
-### 4. Build
+## 5. Run the docs server
 
 ```bash
-mkdocs serve   # Development server
-mkdocs build   # Production build
+mkdocs serve
 ```
 
-### 5. Enable Hot Reload for Source Files
+Open http://127.0.0.1:8000 to see your documentation.
 
-By default, `mkdocs serve` only watches the `docs/` directory. To reload when Nim source files change, add `watch` to your `mkdocs.yml`:
+## 6. Build for deployment
 
-```yaml
-watch:
-  - docs
-  - src  # Reload when Nim source files change
+```bash
+mkdocs build
 ```
+
+This creates a `site/` directory with static HTML ready to deploy to GitHub Pages, Netlify, or any static host.
 
 ## Project Structure
 
@@ -96,15 +122,15 @@ Recommended layout:
 ```
 myproject/
 ├── src/
-│   └── mylib.nim
+│   └── mymodule.nim
 ├── docs/
 │   ├── index.md
 │   └── api.md
 ├── mkdocs.yml
-└── mylib.nimble
+└── myproject.nimble
 ```
 
-## First Build
+## First Build Note
 
 The first documentation build compiles the Nim extractor tool (~15 seconds). Subsequent builds use the cached binary and are fast.
 
