@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation of `source_url` configuration
 - Source code links with GitHub/GitLab/Bitbucket support
 - TOC integration using heading filter
+- PyPI metadata: project URLs, keywords, license classifier
+- Improved README with complete quickstart guide for Nim developers
 
 ### Fixed
 

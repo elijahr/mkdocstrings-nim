@@ -5,79 +5,123 @@
 [![License](https://img.shields.io/github/license/elijahr/mkdocstrings-nim)](https://github.com/elijahr/mkdocstrings-nim/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-elijahr.github.io%2Fmkdocstrings--nim-blue)](https://elijahr.github.io/mkdocstrings-nim/)
 
-A [mkdocstrings](https://mkdocstrings.github.io/) handler for [Nim](https://nim-lang.org/).
+Generate API documentation for your Nim projects.
 
-Parses Nim source files using the Nim compiler's AST to extract module docstrings, procedure signatures, parameter types, return types, and `{.raises.}` pragma annotations. Renders the extracted documentation as HTML within [MkDocs](https://www.mkdocs.org/) using the `::: module` directive syntax.
+mkdocstrings-nim extracts documentation from Nim source files using the Nim compiler's AST, including module docstrings, procedure signatures, parameter types, return types, and pragma annotations. It renders the documentation as HTML using [MkDocs](https://www.mkdocs.org/) and [mkdocstrings](https://mkdocstrings.github.io/).
 
-**[Documentation](https://elijahr.github.io/mkdocstrings-nim/)**
-
-## Installation
-
-```bash
-pip install mkdocstrings-nim
-```
-
-**Requirements:** Nim compiler must be installed and available in PATH.
+**[Full Documentation](https://elijahr.github.io/mkdocstrings-nim/)** | **[Changelog](https://github.com/elijahr/mkdocstrings-nim/blob/main/CHANGELOG.md)**
 
 ## Quick Start
 
-1. Add to your `mkdocs.yml`:
+This guide gets you from zero to a running documentation server for your Nim project.
+
+### Prerequisites
+
+- **Nim** compiler installed and in PATH ([install Nim](https://nim-lang.org/install.html))
+- **Python 3.9+** ([install Python](https://www.python.org/downloads/))
+
+### 1. Install the tools
+
+```bash
+pip install mkdocs mkdocs-material mkdocstrings-nim
+```
+
+### 2. Create mkdocs.yml
+
+In your Nim project root, create `mkdocs.yml`:
 
 ```yaml
+site_name: My Nim Project
+theme:
+  name: material
+
 plugins:
+  - search
   - mkdocstrings:
       handlers:
         nim:
-          paths: [src]
+          paths: [src]  # Where your .nim files are
+          options:
+            show_source: true
+            docstring_style: rst
 ```
 
-2. Use in your markdown:
+### 3. Create your docs
 
+Create a `docs/` directory with an `index.md`:
+
+```bash
+mkdir docs
+```
+
+**docs/index.md:**
 ```markdown
-# API Reference
+# My Nim Project
+
+Welcome to my project documentation.
+
+## API Reference
 
 ::: mymodule
 ```
 
-3. Build your docs:
+The `::: mymodule` directive tells mkdocstrings to extract and render documentation from `src/mymodule.nim`.
+
+### 4. Run the docs server
+
+```bash
+mkdocs serve
+```
+
+Open http://127.0.0.1:8000 to see your documentation.
+
+### 5. Build for deployment
 
 ```bash
 mkdocs build
 ```
 
-## Configuration
+This creates a `site/` directory with static HTML ready to deploy to GitHub Pages, Netlify, or any static host.
 
-### Handler Options
+## Writing Nim Docstrings
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `paths` | `["src"]` | Search paths for Nim source files |
-| `docstring_style` | `"rst"` | Docstring format: `rst`, `google`, `numpy`, `epydoc`, or `auto` |
-| `show_source` | `true` | Show source line numbers |
-| `show_signature` | `true` | Show full signatures |
-| `show_pragmas` | `true` | Show pragma annotations |
-
-### Docstring Format
-
-Use RST-style docstrings in your Nim code:
+Use `##` comments to document your Nim code:
 
 ```nim
+## This module provides greeting utilities.
+
 proc greet*(name: string): string =
   ## Greet someone by name.
   ##
   ## :param name: The name to greet
   ## :returns: A greeting message
   result = "Hello, " & name & "!"
+
+type
+  Config* = object
+    ## Configuration for the greeter.
+    prefix*: string  ## The greeting prefix
+    suffix*: string  ## The greeting suffix
 ```
 
-## Development
+Supported docstring styles: `rst` (default), `google`, `numpy`, `epydoc`.
 
-```bash
-git clone https://github.com/elijahr/mkdocstrings-nim
-cd mkdocstrings-nim
-pip install -e ".[dev]"
-pytest
-```
+## Configuration Options
+
+Configure in `mkdocs.yml` under `plugins > mkdocstrings > handlers > nim > options`:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `paths` | `["src"]` | Search paths for Nim source files |
+| `docstring_style` | `"rst"` | Docstring format: `rst`, `google`, `numpy`, `epydoc`, `auto` |
+| `show_source` | `true` | Show source file and line numbers |
+| `show_signature` | `true` | Show full procedure signatures |
+| `show_pragmas` | `true` | Show pragma annotations like `{.raises.}` |
+| `show_private` | `false` | Include non-exported (private) symbols |
+| `heading_level` | `2` | Starting heading level for entries |
+| `source_url` | `null` | Repository URL for source links (e.g., `https://github.com/user/repo`) |
+
+See the [full documentation](https://elijahr.github.io/mkdocstrings-nim/) for more details.
 
 ## License
 
