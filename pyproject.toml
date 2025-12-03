@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mkdocstrings-nim"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Nim handler for mkdocstrings"
 readme = "README.md"
 license = "MIT"
