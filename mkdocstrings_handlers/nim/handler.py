@@ -165,6 +165,7 @@ class NimHandler(BaseHandler):
             "docstring_style": "rst",
             "source_url": None,  # e.g., "https://github.com/owner/repo"
             "source_ref": None,  # auto-detected from git, or set explicitly
+            "type_field_doc_style": "inline",  # "inline" or "docstring"
         }
         return {**defaults, **self.config_options, **local_options}
 

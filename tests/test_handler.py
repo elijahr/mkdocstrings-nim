@@ -222,3 +222,39 @@ class TestConfigValidation:
             )
 
         assert "source_url is not set" in caplog.text
+
+
+def test_get_options_includes_type_field_doc_style():
+    """Test that type_field_doc_style option is available."""
+    from pathlib import Path
+
+    from mkdocstrings_handlers.nim.handler import NimHandler
+
+    handler = NimHandler(
+        paths=["src"],
+        base_dir=Path.cwd(),
+        mdx=[],
+        mdx_config={},
+    )
+    options = handler.get_options({})
+
+    assert "type_field_doc_style" in options
+    assert options["type_field_doc_style"] == "inline"
+
+
+def test_get_options_type_field_doc_style_override():
+    """Test that type_field_doc_style can be overridden."""
+    from pathlib import Path
+
+    from mkdocstrings_handlers.nim.handler import NimHandler
+
+    handler = NimHandler(
+        paths=["src"],
+        base_dir=Path.cwd(),
+        mdx=[],
+        mdx_config={},
+        config_options={"type_field_doc_style": "docstring"},
+    )
+    options = handler.get_options({})
+
+    assert options["type_field_doc_style"] == "docstring"
