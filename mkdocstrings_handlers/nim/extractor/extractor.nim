@@ -130,6 +130,63 @@ proc extractName(n: PNode): string =
       return $n[1][0].ident.s
   return ""
 
+proc extractObjectFields(recList: PNode, branch: string = ""): seq[FieldInfo] =
+  ## Extract fields from an object's record list
+  result = @[]
+  if recList == nil:
+    return
+
+  for child in recList:
+    case child.kind
+    of nkIdentDefs:
+      # Field: name*: Type ## doc
+      let typNode = child[^2]
+      let typ = if typNode.kind == nkEmpty: "" else: $typNode
+      let doc = extractDocComment(child)
+      # All names except last two (type and default value)
+      for i in 0..<child.len - 2:
+        let nameNode = child[i]
+        result.add FieldInfo(
+          name: extractName(nameNode),
+          typ: typ,
+          doc: doc,
+          exported: isExported(nameNode),
+          branch: branch
+        )
+    of nkRecCase:
+      # Case object: discriminator + branches
+      # First child is the discriminator (nkIdentDefs)
+      if child.len > 0 and child[0].kind == nkIdentDefs:
+        let discrimFields = extractObjectFields(child[0])
+        for f in discrimFields:
+          result.add f
+      # Remaining children are branches
+      for i in 1..<child.len:
+        let branchNode = child[i]
+        case branchNode.kind
+        of nkOfBranch:
+          # nkOfBranch: [condition(s), nkRecList]
+          let branchCond = "when " & $branchNode[0]
+          if branchNode.len > 1:
+            let branchFields = extractObjectFields(branchNode[^1], branchCond)
+            for f in branchFields:
+              result.add f
+        of nkElse:
+          # nkElse: [nkRecList]
+          if branchNode.len > 0:
+            let branchFields = extractObjectFields(branchNode[0], "else")
+            for f in branchFields:
+              result.add f
+        else:
+          discard
+    of nkRecList:
+      # Nested record list
+      let nested = extractObjectFields(child, branch)
+      for f in nested:
+        result.add f
+    else:
+      discard
+
 proc extractProcDoc(n: PNode): string =
   ## Extract doc comment from a proc definition
   ## The doc comment can be on the proc node itself or on the first statement in the body
@@ -169,17 +226,44 @@ proc extractType(n: PNode): DocEntry =
   result.line = n.info.line.int
   result.name = extractName(n[0])
   result.exported = isExported(n[0])
+  result.fields = @[]
+  result.values = @[]
 
-  # Build full signature with type definition
+  # Build full signature with type definition (excluding fields for cleaner display)
   var sig = "type " & result.name
 
   # Add generic params if present (index 1)
   if n.len > 1 and n[1].kind != nkEmpty:
     sig &= $n[1]
 
-  # Add type implementation (index 2)
+  # Analyze type implementation (index 2)
   if n.len > 2 and n[2].kind != nkEmpty:
-    sig &= " = " & $n[2]
+    let typeImpl = n[2]
+    case typeImpl.kind
+    of nkObjectTy:
+      # object type: [pragmas, inheritance, recList]
+      sig &= " = object"
+      if typeImpl.len > 2:
+        result.fields = extractObjectFields(typeImpl[2])
+      # Extract doc from recList if not on type node
+      if result.doc.len == 0 and typeImpl.len > 2 and typeImpl[2] != nil:
+        result.doc = extractDocComment(typeImpl[2])
+    of nkRefTy:
+      # ref object: [objectTy]
+      if typeImpl.len > 0 and typeImpl[0].kind == nkObjectTy:
+        sig &= " = ref object"
+        let objTy = typeImpl[0]
+        if objTy.len > 2:
+          result.fields = extractObjectFields(objTy[2])
+        if result.doc.len == 0 and objTy.len > 2 and objTy[2] != nil:
+          result.doc = extractDocComment(objTy[2])
+      else:
+        sig &= " = " & $typeImpl
+    of nkEnumTy:
+      sig &= " = enum"
+      # Enum extraction handled in next task
+    else:
+      sig &= " = " & $typeImpl
 
   result.signature = sig
 
@@ -347,5 +431,23 @@ proc toJson*(doc: ModuleDoc): JsonNode =
 
     if entry.raises.len > 0:
       entryJson["raises"] = %entry.raises
+
+    if entry.fields.len > 0:
+      entryJson["fields"] = %entry.fields.mapIt(%*{
+        "name": it.name,
+        "type": it.typ,
+        "doc": it.doc,
+        "exported": it.exported,
+        "branch": it.branch
+      })
+
+    if entry.values.len > 0:
+      entryJson["values"] = %entry.values.mapIt(%*{
+        "name": it.name,
+        "type": it.typ,
+        "doc": it.doc,
+        "exported": it.exported,
+        "branch": it.branch
+      })
 
     result["entries"].add entryJson
