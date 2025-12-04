@@ -251,3 +251,63 @@ code.doc-symbol-module::after {
 .doc-attribution a {
   color: inherit;
 }
+
+/* Type field documentation */
+.doc-section-fields,
+.doc-section-values {
+  margin-top: 1rem;
+}
+
+.doc-field-list,
+.doc-value-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0;
+}
+
+.doc-field,
+.doc-value {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.doc-field:last-child,
+.doc-value:last-child {
+  border-bottom: none;
+}
+
+.doc-field-name,
+.doc-value-name {
+  font-weight: 600;
+}
+
+.doc-field-type,
+.doc-value-explicit code {
+  color: var(--md-code-fg-color);
+  background-color: var(--md-code-bg-color);
+  padding: 0.1em 0.3em;
+  border-radius: 0.2rem;
+  margin-left: 0.3em;
+}
+
+.doc-field-private {
+  opacity: 0.7;
+}
+
+.doc-field-private-label {
+  color: var(--md-default-fg-color--lighter);
+  font-size: 0.85em;
+  font-style: italic;
+  margin-left: 0.3em;
+}
+
+.doc-field-branch {
+  color: var(--md-default-fg-color--lighter);
+  font-size: 0.85em;
+  margin-left: 0.3em;
+}
+
+.doc-field-description,
+.doc-value-description {
+  color: var(--md-default-fg-color--light);
+}
