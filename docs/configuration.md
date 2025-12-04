@@ -173,3 +173,41 @@ handlers:
   nim:
     custom_templates: path/to/templates
 ```
+
+## Footer Attribution
+
+By default, each rendered module shows "Generated with mkdocstrings-nim" at the bottom. To move this to the site footer instead (alongside "Made with Material for MkDocs"):
+
+### 1. Create the override template
+
+Create `docs/overrides/main.html`:
+
+```jinja
+{% extends "base.html" %}
+
+{% set extracopyright %}
+  ·
+  <a href="https://mkdocstrings.github.io/" target="_blank" rel="noopener">mkdocstrings</a>
+  ·
+  <a href="https://github.com/elijahr/mkdocstrings-nim" target="_blank" rel="noopener">mkdocstrings-nim</a>
+{% endset %}
+```
+
+### 2. Configure MkDocs
+
+In `mkdocs.yml`:
+
+```yaml
+theme:
+  name: material
+  custom_dir: docs/overrides
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        nim:
+          options:
+            show_attribution: false  # Disable per-module attribution
+```
+
+This displays: **Made with Material for MkDocs · mkdocstrings · mkdocstrings-nim**
