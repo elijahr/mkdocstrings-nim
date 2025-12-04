@@ -197,6 +197,46 @@ proc extractObjectFields(recList: PNode, branch: string = ""): seq[FieldInfo] =
     else:
       discard
 
+proc extractEnumValues(enumDef: PNode): seq[FieldInfo] =
+  ## Extract values from an enum definition
+  result = @[]
+  if enumDef == nil or enumDef.kind != nkEnumTy:
+    return
+
+  for child in enumDef:
+    case child.kind
+    of nkEnumFieldDef:
+      # Enum value with explicit value: name = value
+      let nameNode = child[0]
+      let valueNode = if child.len > 1: child[1] else: nil
+      result.add FieldInfo(
+        name: extractName(nameNode),
+        typ: if valueNode != nil: $valueNode else: "",
+        doc: extractDocComment(child),
+        exported: true,  # enum values always public
+        branch: ""
+      )
+    of nkIdent:
+      # Simple enum value without explicit value
+      result.add FieldInfo(
+        name: $child.ident.s,
+        typ: "",
+        doc: extractDocComment(child),
+        exported: true,
+        branch: ""
+      )
+    of nkSym:
+      # Symbol reference (shouldn't happen in raw AST, but handle it)
+      result.add FieldInfo(
+        name: $child,
+        typ: "",
+        doc: "",
+        exported: true,
+        branch: ""
+      )
+    else:
+      discard
+
 proc extractProcDoc(n: PNode): string =
   ## Extract doc comment from a proc definition
   ## The doc comment can be on the proc node itself or on the first statement in the body
@@ -271,7 +311,7 @@ proc extractType(n: PNode): DocEntry =
         sig &= " = " & $typeImpl
     of nkEnumTy:
       sig &= " = enum"
-      # Enum extraction handled in next task
+      result.values = extractEnumValues(typeImpl)
     else:
       sig &= " = " & $typeImpl
 
