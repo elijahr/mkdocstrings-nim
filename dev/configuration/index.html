@@ -509,6 +509,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#type-field-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Field Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Field Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Object Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enum Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#case-objects-variant-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case Objects (Variant Types)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#identifier-syntax" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -527,6 +577,45 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#footer-attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Footer Attribution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Footer Attribution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-override-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the override template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-mkdocs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Configure MkDocs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -768,6 +857,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#type-field-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Field Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Field Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Object Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enum-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enum Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#case-objects-variant-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case Objects (Variant Types)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#identifier-syntax" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -786,6 +925,45 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#footer-attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Footer Attribution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Footer Attribution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-override-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the override template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-mkdocs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Configure MkDocs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -899,6 +1077,12 @@
 <td>auto-detected</td>
 <td>Git branch or tag for source links (auto-detected from git if not set)</td>
 </tr>
+<tr>
+<td><code>type_field_doc_style</code></td>
+<td>string</td>
+<td><code>"inline"</code></td>
+<td>Source for type field docs: <code>inline</code> (Nim-native <code>## doc</code> after field) or <code>docstring</code> (<code>:var:</code> in type docstring)</td>
+</tr>
 </tbody>
 </table>
 <h2 id="per-object-options">Per-Object Options<a class="headerlink" href="#per-object-options" title="Permanent link">¶</a></h2>
@@ -982,24 +1166,83 @@
 <a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="sd">## string</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="sd">##     Return value description</span>
 </code></pre></div>
+<h2 id="type-field-documentation">Type Field Documentation<a class="headerlink" href="#type-field-documentation" title="Permanent link">¶</a></h2>
+<p>By default, mkdocstrings-nim extracts field documentation from inline comments (Nim-native style):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">type</span><span class="w"> </span><span class="n">Point</span><span class="o">*</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">object</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="sd">## A 2D point.</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="n">x</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">float</span><span class="w">  </span><span class="sd">## X coordinate</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="n">y</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">float</span><span class="w">  </span><span class="sd">## Y coordinate</span>
+</code></pre></div>
+<p>For Python-style documentation using <code>:var:</code> in the type docstring, set <code>type_field_doc_style: docstring</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">handlers</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">nim</span><span class="p">:</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">options</span><span class="p">:</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">      </span><span class="nt">type_field_doc_style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docstring</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">type</span><span class="w"> </span><span class="n">Point</span><span class="o">*</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">object</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="sd">## A 2D point.</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="sd">##</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="sd">## :var x: X coordinate</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="sd">## :var y: Y coordinate</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">x</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">float</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="n">y</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">float</span>
+</code></pre></div>
+<h3 id="object-types">Object Types<a class="headerlink" href="#object-types" title="Permanent link">¶</a></h3>
+<p>Object and ref object types display a <strong>Fields</strong> section listing each field with its type and documentation.</p>
+<p>Private fields (without <code>*</code>) are hidden by default. Enable <code>show_private: true</code> to display them with a "private" label.</p>
+<h3 id="enum-types">Enum Types<a class="headerlink" href="#enum-types" title="Permanent link">¶</a></h3>
+<p>Enum types display a <strong>Values</strong> section listing each enum value with its explicit value (if any) and documentation.</p>
+<h3 id="case-objects-variant-types">Case Objects (Variant Types)<a class="headerlink" href="#case-objects-variant-types" title="Permanent link">¶</a></h3>
+<p>Case object fields include branch annotations showing which discriminator value activates them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kind (NodeKind) - The node discriminator
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>intVal (int) [when nkInt] - Integer value
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>strVal (string) [when nkString] - String value
+</code></pre></div>
 <h2 id="identifier-syntax">Identifier Syntax<a class="headerlink" href="#identifier-syntax" title="Permanent link">¶</a></h2>
 <p>Reference modules and nested paths:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>&lt;!-- Module --&gt;
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>::: mymodule
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>&lt;!-- Nested module --&gt;
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>::: mypackage.submodule
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>&lt;!-- Specific item (planned) --&gt;
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>::: mymodule.MyType
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&lt;!-- Module --&gt;
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>::: mymodule
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>&lt;!-- Nested module --&gt;
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>::: mypackage.submodule
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>&lt;!-- Specific item (planned) --&gt;
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>::: mymodule.MyType
 </code></pre></div>
 <h2 id="theme-support">Theme Support<a class="headerlink" href="#theme-support" title="Permanent link">¶</a></h2>
 <p>The handler includes templates for the Material theme. Other themes use fallback templates.</p>
 <p>For custom templates, set:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">handlers</span><span class="p">:</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">nim</span><span class="p">:</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">custom_templates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path/to/templates</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">handlers</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">nim</span><span class="p">:</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">custom_templates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path/to/templates</span>
 </code></pre></div>
+<h2 id="footer-attribution">Footer Attribution<a class="headerlink" href="#footer-attribution" title="Permanent link">¶</a></h2>
+<p>By default, each rendered module shows "Generated with mkdocstrings-nim" at the bottom. To move this to the site footer instead (alongside "Made with Material for MkDocs"):</p>
+<h3 id="1-create-the-override-template">1. Create the override template<a class="headerlink" href="#1-create-the-override-template" title="Permanent link">¶</a></h3>
+<p>Create <code>docs/overrides/main.html</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">"base.html"</span> <span class="cp">%}</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="cp">{%</span> <span class="k">set</span> <span class="nv">extracopyright</span> <span class="cp">%}</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="x">  ·</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="x">  &lt;a href="https://mkdocstrings.github.io/" target="_blank" rel="noopener"&gt;mkdocstrings&lt;/a&gt;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="x">  ·</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="x">  &lt;a href="https://github.com/elijahr/mkdocstrings-nim" target="_blank" rel="noopener"&gt;mkdocstrings-nim&lt;/a&gt;</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="cp">{%</span> <span class="k">endset</span> <span class="cp">%}</span>
+</code></pre></div>
+<h3 id="2-configure-mkdocs">2. Configure MkDocs<a class="headerlink" href="#2-configure-mkdocs" title="Permanent link">¶</a></h3>
+<p>In <code>mkdocs.yml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">theme</span><span class="p">:</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">material</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">custom_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs/overrides</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="nt">plugins</span><span class="p">:</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mkdocstrings</span><span class="p">:</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">      </span><span class="nt">handlers</span><span class="p">:</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">        </span><span class="nt">nim</span><span class="p">:</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">          </span><span class="nt">options</span><span class="p">:</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">            </span><span class="nt">show_attribution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># Disable per-module attribution</span>
+</code></pre></div>
+<p>This displays: <strong>Made with Material for MkDocs · mkdocstrings · mkdocstrings-nim</strong></p>
 
 
 
@@ -1022,7 +1265,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="December 2, 2025 15:41:52 UTC"><span class="timeago" datetime="2025-12-02T15:41:52+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="December 2, 2025 15:41:52 UTC">2025-12-02</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="December 4, 2025 06:50:37 UTC"><span class="timeago" datetime="2025-12-04T06:50:37+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="December 4, 2025 06:50:37 UTC">2025-12-04</span>
   </span>
 
     
