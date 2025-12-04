@@ -54,3 +54,4 @@ docs/plans/
 .DS_Store
 Thumbs.db
 uv.lock
+mkdocstrings_handlers/nim/extractor/nimdocinfo
