@@ -36,6 +36,7 @@ plugins:
 | `heading_level` | int | `2` | Starting HTML heading level |
 | `source_url` | string | `null` | Base URL for source links (e.g., `https://github.com/owner/repo`) |
 | `source_ref` | string | auto-detected | Git branch or tag for source links (auto-detected from git if not set) |
+| `type_field_doc_style` | string | `"inline"` | Source for type field docs: `inline` (Nim-native `## doc` after field) or `docstring` (`:var:` in type docstring) |
 
 ## Per-Object Options
 
@@ -145,6 +146,56 @@ proc example*(x: int): string =
   ## -------
   ## string
   ##     Return value description
+```
+
+## Type Field Documentation
+
+By default, mkdocstrings-nim extracts field documentation from inline comments (Nim-native style):
+
+```nim
+type Point* = object
+  ## A 2D point.
+  x*: float  ## X coordinate
+  y*: float  ## Y coordinate
+```
+
+For Python-style documentation using `:var:` in the type docstring, set `type_field_doc_style: docstring`:
+
+```yaml
+handlers:
+  nim:
+    options:
+      type_field_doc_style: docstring
+```
+
+```nim
+type Point* = object
+  ## A 2D point.
+  ##
+  ## :var x: X coordinate
+  ## :var y: Y coordinate
+  x*: float
+  y*: float
+```
+
+### Object Types
+
+Object and ref object types display a **Fields** section listing each field with its type and documentation.
+
+Private fields (without `*`) are hidden by default. Enable `show_private: true` to display them with a "private" label.
+
+### Enum Types
+
+Enum types display a **Values** section listing each enum value with its explicit value (if any) and documentation.
+
+### Case Objects (Variant Types)
+
+Case object fields include branch annotations showing which discriminator value activates them:
+
+```
+kind (NodeKind) - The node discriminator
+intVal (int) [when nkInt] - Integer value
+strVal (string) [when nkString] - String value
 ```
 
 ## Identifier Syntax
