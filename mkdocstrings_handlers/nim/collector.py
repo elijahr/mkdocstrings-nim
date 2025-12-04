@@ -61,6 +61,8 @@ class NimEntry:
     pragmas: list[str] = field(default_factory=list)
     raises: list[str] = field(default_factory=list)
     exported: bool = True  # True if symbol has * (public API)
+    fields: list[NimField] = field(default_factory=list)  # For object/ref object types
+    values: list[NimField] = field(default_factory=list)  # For enum types
 
 
 @dataclass
