@@ -180,6 +180,9 @@ class NimHandler(BaseHandler):
 
         parsed = parse_docstring(entry.doc, style)
 
+        # Replace raw docstring with just the description (without field lists)
+        entry.doc = parsed.description
+
         # Update params with descriptions from docstring
         for param in entry.params:
             for doc_param in parsed.params:
