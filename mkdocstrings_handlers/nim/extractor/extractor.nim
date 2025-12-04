@@ -312,6 +312,9 @@ proc extractType(n: PNode): DocEntry =
     of nkEnumTy:
       sig &= " = enum"
       result.values = extractEnumValues(typeImpl)
+      # Extract doc from enum type if not on type node
+      if result.doc.len == 0:
+        result.doc = extractDocComment(typeImpl)
     else:
       sig &= " = " & $typeImpl
 
