@@ -301,6 +301,28 @@ class NimCollector:
                 NimParam(name=p["name"], type=p["type"]) for p in entry_data.get("params", [])
             ]
 
+            fields = [
+                NimField(
+                    name=f["name"],
+                    type=f["type"],
+                    doc=f.get("doc", ""),
+                    exported=f.get("exported", True),
+                    branch=f.get("branch", ""),
+                )
+                for f in entry_data.get("fields", [])
+            ]
+
+            values = [
+                NimField(
+                    name=v["name"],
+                    type=v["type"],
+                    doc=v.get("doc", ""),
+                    exported=v.get("exported", True),
+                    branch=v.get("branch", ""),
+                )
+                for v in entry_data.get("values", [])
+            ]
+
             entries.append(
                 NimEntry(
                     name=entry_data["name"],
@@ -313,6 +335,8 @@ class NimCollector:
                     pragmas=entry_data.get("pragmas", []),
                     raises=entry_data.get("raises", []),
                     exported=entry_data.get("exported", True),
+                    fields=fields,
+                    values=values,
                 )
             )
 

@@ -1,6 +1,6 @@
 """Tests for type field extraction."""
 
-from mkdocstrings_handlers.nim.collector import NimEntry, NimField
+from mkdocstrings_handlers.nim.collector import NimCollector, NimEntry, NimField
 
 
 def test_nimfield_dataclass_exists():
@@ -56,3 +56,60 @@ def test_nimentry_with_fields():
     )
     assert len(entry.fields) == 2
     assert entry.fields[0].name == "x"
+
+
+def test_parse_module_with_fields(tmp_path):
+    """Test parsing module data with fields."""
+    collector = NimCollector(["src"], tmp_path)
+    data = {
+        "module": "test",
+        "file": str(tmp_path / "test.nim"),
+        "entries": [
+            {
+                "name": "Point",
+                "kind": "type",
+                "line": 1,
+                "signature": "type Point = object",
+                "fields": [
+                    {"name": "x", "type": "int", "doc": "X coord", "exported": True, "branch": ""},
+                    {"name": "y", "type": "int", "doc": "Y coord", "exported": True, "branch": ""},
+                ],
+            }
+        ],
+    }
+
+    module = collector._parse_module(data)
+
+    assert len(module.entries) == 1
+    assert len(module.entries[0].fields) == 2
+    assert module.entries[0].fields[0].name == "x"
+    assert module.entries[0].fields[0].type == "int"
+    assert module.entries[0].fields[0].doc == "X coord"
+
+
+def test_parse_module_with_enum_values(tmp_path):
+    """Test parsing module data with enum values."""
+    collector = NimCollector(["src"], tmp_path)
+    data = {
+        "module": "test",
+        "file": str(tmp_path / "test.nim"),
+        "entries": [
+            {
+                "name": "Color",
+                "kind": "type",
+                "line": 1,
+                "signature": "type Color = enum",
+                "values": [
+                    {"name": "Red", "type": "", "doc": "Red color", "exported": True, "branch": ""},
+                    {"name": "Green", "type": "1", "doc": "", "exported": True, "branch": ""},
+                ],
+            }
+        ],
+    }
+
+    module = collector._parse_module(data)
+
+    assert len(module.entries) == 1
+    assert len(module.entries[0].values) == 2
+    assert module.entries[0].values[0].name == "Red"
+    assert module.entries[0].values[1].type == "1"
