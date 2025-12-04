@@ -28,6 +28,41 @@ Context:
       </div>
     {% endif %}
 
+    {% if entry.fields %}
+      {% set visible_fields = entry.fields if config.show_private else entry.fields | selectattr("exported") | list %}
+      {% if visible_fields %}
+      <div class="doc-section doc-section-fields">
+        <p class="doc-section-title">Fields</p>
+        <ul class="doc-field-list">
+          {% for field in visible_fields %}
+          <li class="doc-field{% if not field.exported %} doc-field-private{% endif %}">
+            <code class="doc-field-name">{{ field.name }}</code>
+            {% if field.type %}<code class="doc-field-type">{{ field.type }}</code>{% endif %}
+            {% if not field.exported %}<span class="doc-field-private-label">private</span>{% endif %}
+            {% if field.branch %}<span class="doc-field-branch">[{{ field.branch }}]</span>{% endif %}
+            {% if field.doc %}<span class="doc-field-description"> &ndash; {{ field.doc }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if entry.values %}
+      <div class="doc-section doc-section-values">
+        <p class="doc-section-title">Values</p>
+        <ul class="doc-value-list">
+          {% for val in entry.values %}
+          <li class="doc-value">
+            <code class="doc-value-name">{{ val.name }}</code>
+            {% if val.type %}<span class="doc-value-explicit"> = <code>{{ val.type }}</code></span>{% endif %}
+            {% if val.doc %}<span class="doc-value-description"> &ndash; {{ val.doc }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     {% if config.show_source and entry.line %}
       <div class="doc-source">
         <span class="doc-source-label">Source:</span>
