@@ -123,6 +123,11 @@ Configure in `mkdocs.yml` under `plugins > mkdocstrings > handlers > nim > optio
 
 See the [full documentation](https://elijahr.github.io/mkdocstrings-nim/) for more details.
 
+## Projects Using mkdocstrings-nim
+
+- [nim-typestates](https://github.com/elijahr/nim-typestates) - Compile-time state machine verification
+- [lockfreequeues](https://github.com/elijahr/lockfreequeues) - Lock-free data structures for Nim
+
 ## License
 
 MIT
