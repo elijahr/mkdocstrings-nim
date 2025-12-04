@@ -36,6 +36,17 @@ class NimParam:
 
 
 @dataclass
+class NimField:
+    """A Nim type field or enum value."""
+
+    name: str
+    type: str
+    doc: str = ""
+    exported: bool = True
+    branch: str = ""  # For case object branches: "when kind = x"
+
+
+@dataclass
 class NimEntry:
     """A documented Nim entry (proc, type, const, etc.)."""
 
