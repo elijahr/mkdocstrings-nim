@@ -157,9 +157,19 @@ proc extractObjectFields(recList: PNode, branch: string = ""): seq[FieldInfo] =
       # Case object: discriminator + branches
       # First child is the discriminator (nkIdentDefs)
       if child.len > 0 and child[0].kind == nkIdentDefs:
-        let discrimFields = extractObjectFields(child[0])
-        for f in discrimFields:
-          result.add f
+        let discriminator = child[0]
+        let typNode = discriminator[^2]
+        let typ = if typNode.kind == nkEmpty: "" else: $typNode
+        let doc = extractDocComment(discriminator)
+        for i in 0..<discriminator.len - 2:
+          let nameNode = discriminator[i]
+          result.add FieldInfo(
+            name: extractName(nameNode),
+            typ: typ,
+            doc: doc,
+            exported: isExported(nameNode),
+            branch: ""  # Discriminator has no branch
+          )
       # Remaining children are branches
       for i in 1..<child.len:
         let branchNode = child[i]
