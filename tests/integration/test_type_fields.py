@@ -51,6 +51,20 @@ class TestObjectFieldExtraction:
 
         assert len(empty.fields) == 0
 
+    def test_generic_object_fields(self, collector):
+        """Test extraction of generic object fields."""
+        module = collector.collect("types_with_fields")
+
+        generic = next(e for e in module.entries if e.name == "Generic")
+
+        assert len(generic.fields) == 2
+        value_field = next(f for f in generic.fields if f.name == "value")
+        assert value_field.type == "T"
+        assert value_field.exported is True
+
+        count_field = next(f for f in generic.fields if f.name == "count")
+        assert count_field.type == "int"
+
 
 class TestEnumValueExtraction:
     """Tests for enum value extraction."""

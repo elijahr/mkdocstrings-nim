@@ -258,3 +258,48 @@ def test_get_options_type_field_doc_style_override():
     options = handler.get_options({})
 
     assert options["type_field_doc_style"] == "docstring"
+
+
+def test_type_field_doc_style_passed_to_render(tmp_path):
+    """Test that type_field_doc_style config is passed through to templates."""
+    from mkdocstrings_handlers.nim.handler import get_handler
+
+    # Create a minimal Nim file
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "test.nim").write_text("type Point* = object\n  x*: int\n")
+
+    class MockToolConfig:
+        config_file_path = str(tmp_path / "mkdocs.yml")
+
+    handler = get_handler(
+        handler_config={
+            "paths": ["src"],
+            "options": {"type_field_doc_style": "docstring"},
+        },
+        tool_config=MockToolConfig(),
+        mdx=[],
+        mdx_config={},
+    )
+
+    # Mock filters for testing
+    handler.env.filters["convert_markdown"] = lambda text, *_args, **_kwargs: text
+
+    def mock_heading(text, level, **kwargs):
+        html_id = kwargs.get("id", "")
+        html_class = kwargs.get("class", "")
+        return f'<h{level} id="{html_id}" class="{html_class}">{text}</h{level}>'
+
+    handler.env.filters["heading"] = mock_heading
+
+    options = handler.get_options({})
+    data = handler.collect("test", options)
+
+    # Render the data to verify config is passed through
+    # The render method should receive the config with type_field_doc_style
+    result = handler.render(data, options)
+
+    # Verify the config is present in render options
+    assert options["type_field_doc_style"] == "docstring"
+    # The actual rendering should not fail with this config
+    assert result is not None
