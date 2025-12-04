@@ -3,6 +3,13 @@ import std/[json, strutils, sequtils, os]
 import compiler/[ast, parser, idents, options, pathutils, lineinfos, msgs, renderer, llstream]
 
 type
+  FieldInfo* = object
+    name*: string
+    typ*: string
+    doc*: string
+    exported*: bool
+    branch*: string  ## Empty or "when kind = x" for case objects
+
   DocEntry* = object
     name*: string
     kind*: string
@@ -14,6 +21,8 @@ type
     raises*: seq[string]
     doc*: string
     exported*: bool  ## True if symbol has * (public API)
+    fields*: seq[FieldInfo]  ## For object/ref object types
+    values*: seq[FieldInfo]  ## For enum types
 
   ModuleDoc* = object
     module*: string
