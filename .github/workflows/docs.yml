@@ -37,8 +37,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: |
-          pip install ".[docs]"
+        run: pip install -e ".[docs]"
 
       - name: Configure git
         run: |
