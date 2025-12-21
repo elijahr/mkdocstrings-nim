@@ -8,7 +8,11 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Any, ClassVar
 
+from markupsafe import Markup
 from mkdocstrings import BaseHandler, CollectorItem, HandlerOptions, get_logger
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers.nimrod import NimrodLexer
 
 from mkdocstrings_handlers.nim.collector import NimCollector, NimEntry, NimModule
 from mkdocstrings_handlers.nim.docstring import DocstringStyle, parse_docstring
@@ -27,6 +31,10 @@ class NimHandler(BaseHandler):
     name: ClassVar[str] = "nim"
     domain: ClassVar[str] = "nim"
     fallback_theme: ClassVar[str] = "material"
+
+    # Shared lexer and formatter for Pygments highlighting
+    _nim_lexer = NimrodLexer()
+    _html_formatter = HtmlFormatter(nowrap=True)
 
     def __init__(
         self,
@@ -57,6 +65,22 @@ class NimHandler(BaseHandler):
         self.base_dir = base_dir
         self.config_options = self._validate_and_enhance_config(config_options or {}, base_dir)
         self.collector = NimCollector(self.paths, base_dir)
+
+        # Register custom Jinja filters
+        self.env.filters["highlight_nim"] = self._highlight_nim
+
+    @staticmethod
+    def _highlight_nim(code: str) -> Markup:
+        """Highlight Nim code using Pygments.
+
+        Args:
+            code: Nim source code to highlight.
+
+        Returns:
+            Highlighted HTML wrapped in Markup for safe rendering.
+        """
+        highlighted = highlight(code, NimHandler._nim_lexer, NimHandler._html_formatter)
+        return Markup(highlighted)
 
     @staticmethod
     def _detect_git_branch(base_dir: Path) -> str | None:

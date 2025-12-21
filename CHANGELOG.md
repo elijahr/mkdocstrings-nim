@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-12-21
+
+### Added
+
+- Pygments syntax highlighting for Nim code signatures (uses NimrodLexer)
+- Nim-specific symbol type styling with colors (const, var, let, type, proc, func, iterator, template, macro, converter)
+- Signature block styling with left accent border
+- Section heading styling (Parameters, Returns, Raises) with smaller, uppercase, muted appearance
+- Raises section with amber/orange warning styling
+- Pragma/label badges with key:value format support (e.g., `deprecated: "use X instead"`)
+- Source link styling as footnote-style references
+
 ## [0.2.0] - 2025-12-04
 
 ### Added

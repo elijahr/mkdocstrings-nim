@@ -21,9 +21,11 @@ repos:
       - id: mypy
         additional_dependencies:
           - types-setuptools
+          - types-Pygments
           - mkdocstrings>=0.26
           - jinja2
           - docstring-parser
+          - pygments
         args: [--config-file=pyproject.toml]
         pass_filenames: false
         entry: mypy mkdocstrings_handlers

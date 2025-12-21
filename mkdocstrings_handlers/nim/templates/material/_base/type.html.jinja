@@ -17,7 +17,7 @@ Context:
 
   {% if config.show_signature %}
     <div class="doc-signature highlight">
-      <pre><code class="language-nim">{{ entry.signature }}</code></pre>
+      <pre><code class="language-nim highlight">{{ entry.signature | highlight_nim }}</code></pre>
     </div>
   {% endif %}
 
