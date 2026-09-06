@@ -314,12 +314,12 @@ def _setup_zensical_assets(handler: NimHandler) -> None:
 
     if getattr(z_compat, "_nim_assets_hooked", False):
         return
-    z_compat._nim_assets_hooked = True  # type: ignore[attr-defined]
+    setattr(z_compat, "_nim_assets_hooked", True)  # noqa: B010
 
     original_get_inventory = z_compat.get_inventory
 
     def get_inventory_with_nim_assets(cached: bytes | None) -> bytes:
-        result = original_get_inventory(cached)
+        result: bytes = original_get_inventory(cached)
         try:
             cfg = z_config.get_config()
             root_dir = Path(cfg.get("root_dir", ".")) if cfg else Path(".")
@@ -349,7 +349,7 @@ def _setup_zensical_assets(handler: NimHandler) -> None:
 
         return result
 
-    get_inventory_with_nim_assets.__wrapped__ = original_get_inventory  # type: ignore[attr-defined]
+    setattr(get_inventory_with_nim_assets, "__wrapped__", original_get_inventory)  # noqa: B010
     z_compat.get_inventory = get_inventory_with_nim_assets
 
 

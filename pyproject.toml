@@ -126,5 +126,6 @@ ignore_missing_imports = false
 module = [
     "docstring_parser.*",
     "mkdocstrings.*",
+    "zensical.*",
 ]
 ignore_missing_imports = true
