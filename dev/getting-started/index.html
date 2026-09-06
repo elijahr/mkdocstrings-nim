@@ -371,10 +371,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-install-the-tools" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Install the tools
+        Installation
       
     </span>
   </a>
@@ -382,10 +382,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-mkdocsyml" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Create mkdocs.yml
+        Configuration
       
     </span>
   </a>
@@ -662,10 +662,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-install-the-tools" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Install the tools
+        Installation
       
     </span>
   </a>
@@ -673,10 +673,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-mkdocsyml" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Create mkdocs.yml
+        Configuration
       
     </span>
   </a>
@@ -829,105 +829,148 @@
 <p>Verify Nim is installed:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>nim<span class="w"> </span>--version
 </code></pre></div>
-<h2 id="1-install-the-tools">1. Install the tools<a class="headerlink" href="#1-install-the-tools" title="Permanent link">¶</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs<span class="w"> </span>mkdocs-material<span class="w"> </span>mkdocstrings-nim
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¶</a></h2>
+<p>=== "Zensical (Recommended)"</p>
+<div class="highlight"><pre><span></span><code>```bash
+pip install zensical mkdocstrings-nim
+```
 </code></pre></div>
-<h2 id="2-create-mkdocsyml">2. Create mkdocs.yml<a class="headerlink" href="#2-create-mkdocsyml" title="Permanent link">¶</a></h2>
-<p>In your Nim project root, create <code>mkdocs.yml</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">site_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Nim Project</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">theme</span><span class="p">:</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">material</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">plugins</span><span class="p">:</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">search</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mkdocstrings</span><span class="p">:</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nt">handlers</span><span class="p">:</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">        </span><span class="nt">nim</span><span class="p">:</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">          </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">src</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Where your .nim files are</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">          </span><span class="nt">options</span><span class="p">:</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">            </span><span class="nt">show_source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">            </span><span class="nt">docstring_style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rst</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">            </span><span class="nt">heading_level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Recommended for TOC integration</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="nt">markdown_extensions</span><span class="p">:</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">toc</span><span class="p">:</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">      </span><span class="nt">permalink</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nt">toc_depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">  </span><span class="c1"># Include h2, h3, h4 in TOC</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="nt">watch</span><span class="p">:</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w">  </span><span class="c1"># Reload when Nim source files change</span>
+<p>=== "MkDocs"</p>
+<div class="highlight"><pre><span></span><code>```bash
+pip install mkdocs mkdocs-material mkdocstrings-nim
+```
+</code></pre></div>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">¶</a></h2>
+<p>=== "Zensical (<code>zensical.toml</code>)"</p>
+<div class="highlight"><pre><span></span><code>Create `zensical.toml` in your project root:
+
+```toml
+[project]
+site_name = "My Nim Project"
+
+[project.plugins.mkdocstrings]
+default_handler = "nim"
+
+[project.plugins.mkdocstrings.handlers.nim]
+paths = ["src"]
+```
+</code></pre></div>
+<p>=== "MkDocs (<code>mkdocs.yml</code>)"</p>
+<div class="highlight"><pre><span></span><code>Create `mkdocs.yml` in your project root:
+
+```yaml
+site_name: My Nim Project
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: nim
+      handlers:
+        nim:
+          paths: [src]
+          options:
+            show_source: true
+            docstring_style: rst
+            heading_level: 3
+
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 4
+
+watch:
+  - docs
+  - src
+```
 </code></pre></div>
 <h2 id="3-create-your-docs">3. Create your docs<a class="headerlink" href="#3-create-your-docs" title="Permanent link">¶</a></h2>
 <p>Create a <code>docs/</code> directory with documentation files:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mkdir<span class="w"> </span>docs
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>docs
 </code></pre></div>
 <p><strong>docs/index.md:</strong>
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gh"># My Nim Project</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Welcome to my project documentation.
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="gu">## API Reference</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>::: mymodule
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gh"># My Nim Project</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Welcome to my project documentation.
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="gu">## API Reference</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>::: mymodule
 </code></pre></div><p></p>
 <p>The <code>mymodule</code> directive tells mkdocstrings to extract and render documentation from <code>src/mymodule.nim</code>.</p>
 <h2 id="4-write-documented-nim-code">4. Write documented Nim code<a class="headerlink" href="#4-write-documented-nim-code" title="Permanent link">¶</a></h2>
 <p>Create a Nim module with docstrings using <code>##</code> comments:</p>
 <p><strong>src/mymodule.nim:</strong>
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="sd">## This module provides greeting utilities.</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">type</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">Config</span><span class="o">*</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">object</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="sd">## Configuration settings.</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">name</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">string</span><span class="w">  </span><span class="sd">## The name to use</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">debug</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">bool</span><span class="w">   </span><span class="sd">## Enable debug mode</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="k">proc</span><span class="w"> </span><span class="nf">greet</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="nb">string</span><span class="p">):</span><span class="w"> </span><span class="nb">string</span><span class="w"> </span><span class="o">=</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="sd">## Greet someone by name.</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="sd">##</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="sd">## :param name: The name to greet</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="sd">## :returns: A greeting message</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Hello, "</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="s">"!"</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">proc</span><span class="w"> </span><span class="nf">init</span><span class="o">*</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span><span class="w"> </span><span class="n">Config</span><span class="p">):</span><span class="w"> </span><span class="nb">bool</span><span class="w"> </span><span class="o">=</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="sd">## Initialize the library.</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">  </span><span class="sd">##</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">  </span><span class="sd">## :param cfg: Configuration to use</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">  </span><span class="sd">## :returns: True if successful</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kp">true</span>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="sd">## This module provides greeting utilities.</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">type</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="n">Config</span><span class="o">*</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">object</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="sd">## Configuration settings.</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">name</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">string</span><span class="w">  </span><span class="sd">## The name to use</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">debug</span><span class="o">*</span><span class="p">:</span><span class="w"> </span><span class="nb">bool</span><span class="w">   </span><span class="sd">## Enable debug mode</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">proc</span><span class="w"> </span><span class="nf">greet</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="nb">string</span><span class="p">):</span><span class="w"> </span><span class="nb">string</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="sd">## Greet someone by name.</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="sd">##</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="sd">## :param name: The name to greet</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">  </span><span class="sd">## :returns: A greeting message</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Hello, "</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="s">"!"</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="k">proc</span><span class="w"> </span><span class="nf">init</span><span class="o">*</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span><span class="w"> </span><span class="n">Config</span><span class="p">):</span><span class="w"> </span><span class="nb">bool</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">  </span><span class="sd">## Initialize the library.</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">  </span><span class="sd">##</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">  </span><span class="sd">## :param cfg: Configuration to use</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">  </span><span class="sd">## :returns: True if successful</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kp">true</span>
 </code></pre></div><p></p>
 <h2 id="5-run-the-docs-server">5. Run the docs server<a class="headerlink" href="#5-run-the-docs-server" title="Permanent link">¶</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdocs<span class="w"> </span>serve
+<p>=== "Zensical"</p>
+<div class="highlight"><pre><span></span><code>```bash
+zensical serve
+```
+</code></pre></div>
+<p>=== "MkDocs"</p>
+<div class="highlight"><pre><span></span><code>```bash
+mkdocs serve
+```
 </code></pre></div>
 <p>Open http://127.0.0.1:8000 to see your documentation.</p>
 <h2 id="6-build-for-deployment">6. Build for deployment<a class="headerlink" href="#6-build-for-deployment" title="Permanent link">¶</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mkdocs<span class="w"> </span>build
+<p>=== "Zensical"</p>
+<div class="highlight"><pre><span></span><code>```bash
+zensical build
+```
+</code></pre></div>
+<p>=== "MkDocs"</p>
+<div class="highlight"><pre><span></span><code>```bash
+mkdocs build
+```
 </code></pre></div>
 <p>This creates a <code>site/</code> directory with static HTML ready to deploy to GitHub Pages, Netlify, or any static host.</p>
 <h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">¶</a></h2>
 <p>Recommended layout:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>myproject/
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>├── src/
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>│   └── mymodule.nim
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>├── docs/
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>│   ├── index.md
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>│   └── api.md
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>├── mkdocs.yml
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>└── myproject.nimble
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>myproject/
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>├── src/
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>│   └── mymodule.nim
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>├── docs/
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>│   ├── index.md
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>│   └── api.md
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>├── mkdocs.yml
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>└── myproject.nimble
 </code></pre></div>
 <h2 id="first-build-note">First Build Note<a class="headerlink" href="#first-build-note" title="Permanent link">¶</a></h2>
 <p>The first documentation build compiles the Nim extractor tool (~15 seconds). Subsequent builds use the cached binary and are fast.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">¶</a></h2>
 <h3 id="nim-compiler-not-found">"Nim compiler not found"<a class="headerlink" href="#nim-compiler-not-found" title="Permanent link">¶</a></h3>
 <p>Ensure <code>nim</code> is in your PATH:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>which<span class="w"> </span>nim
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>which<span class="w"> </span>nim
 </code></pre></div>
 <h3 id="could-not-find-nim-file">"Could not find Nim file"<a class="headerlink" href="#could-not-find-nim-file" title="Permanent link">¶</a></h3>
 <p>Check that <code>paths</code> in your handler config points to your source directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">handlers</span><span class="p">:</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">nim</span><span class="p">:</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">src</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Adjust to match your layout</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">handlers</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">nim</span><span class="p">:</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">src</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Adjust to match your layout</span>
 </code></pre></div>
 <h3 id="slow-first-build">Slow first build<a class="headerlink" href="#slow-first-build" title="Permanent link">¶</a></h3>
 <p>Normal. The Nim extractor compiles on first use. The binary is cached in <code>/tmp/mkdocstrings-nim-cache/</code>.</p>
@@ -953,7 +996,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="December 3, 2025 05:59:41 UTC"><span class="timeago" datetime="2025-12-03T05:59:41+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="December 3, 2025 05:59:41 UTC">2025-12-03</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="September 6, 2026 08:13:10 UTC"><span class="timeago" datetime="2026-09-06T08:13:10+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="September 6, 2026 08:13:10 UTC">2026-09-06</span>
   </span>
 
     
