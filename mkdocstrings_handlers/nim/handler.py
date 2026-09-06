@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
+import sys
 from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Any, ClassVar
@@ -272,12 +274,83 @@ class NimHandler(BaseHandler):
             raise TypeError(f"Expected NimModule, got {type(data)}")
 
         template = self.env.get_template("module.html.jinja")
-        return template.render(
+        rendered = template.render(
             module=data,
             config=options,
             heading_level=options.get("heading_level", 2),
             root=True,
         )
+
+        if _is_zensical() and self.extra_css:
+            asset_link = '<link rel="stylesheet" href="assets/stylesheets/mkdocstrings-nim.css">'
+            style_tag = f"<style>\n{self.extra_css}\n</style>"
+            return f"{asset_link}\n{style_tag}\n{rendered}"
+
+        return rendered
+
+
+def _is_zensical() -> bool:
+    """Check whether execution is running under the Zensical SSG environment."""
+    return "zensical" in sys.modules
+
+
+def _setup_zensical_assets(handler: NimHandler) -> None:
+    """Register a post-build asset hook in Zensical to write handler CSS and media.
+
+    Zensical runs builds through a Rust core (zrx) and does not invoke legacy
+    MkDocs plugin hooks (like on_post_build). Instead, Zensical invokes
+    `zensical.compat.mkdocstrings.get_inventory()` at the conclusion of the build
+    to extract `objects.inv`. Hooking this callback allows writing handler-specific
+    stylesheets and assets directly into the final `site/` distribution.
+    """
+    if not _is_zensical():
+        return
+
+    try:
+        import zensical.compat.mkdocstrings as z_compat
+        import zensical.config as z_config
+    except ImportError:
+        return
+
+    if getattr(z_compat, "_nim_assets_hooked", False):
+        return
+    setattr(z_compat, "_nim_assets_hooked", True)  # noqa: B010
+
+    original_get_inventory = z_compat.get_inventory
+
+    def get_inventory_with_nim_assets(cached: bytes | None) -> bytes:
+        result: bytes = original_get_inventory(cached)
+        try:
+            cfg = z_config.get_config()
+            root_dir = Path(cfg.get("root_dir", ".")) if cfg else Path(".")
+            site_dir = Path(cfg.get("site_dir", "site")) if cfg else Path("site")
+            if not site_dir.is_absolute():
+                site_dir = root_dir / site_dir
+
+            # 1. Write handler extra_css to site/assets/stylesheets/mkdocstrings-nim.css
+            if handler.extra_css:
+                css_file = site_dir / "assets" / "stylesheets" / "mkdocstrings-nim.css"
+                css_file.parent.mkdir(parents=True, exist_ok=True)
+                css_file.write_text(handler.extra_css, encoding="utf-8")
+                _logger.debug(f"Wrote mkdocstrings-nim stylesheet to {css_file}")
+
+            # 2. Copy any extra media/asset files from templates if present
+            searchpaths = getattr(handler.env.loader, "searchpath", [])
+            for template_dir in searchpaths:
+                assets_src = Path(template_dir) / "assets"
+                if assets_src.is_dir():
+                    assets_dest = site_dir / "assets" / "mkdocstrings-nim"
+                    shutil.copytree(assets_src, assets_dest, dirs_exist_ok=True)
+                    _logger.debug(
+                        f"Copied mkdocstrings-nim template assets from {assets_src} to {assets_dest}"
+                    )
+        except Exception as err:
+            _logger.warning(f"mkdocstrings-nim: Failed to write Zensical assets: {err}")
+
+        return result
+
+    setattr(get_inventory_with_nim_assets, "__wrapped__", original_get_inventory)  # noqa: B010
+    z_compat.get_inventory = get_inventory_with_nim_assets
 
 
 def get_handler(
@@ -299,9 +372,14 @@ def get_handler(
     paths = handler_config.get("paths", ["src"])
     options = handler_config.get("options", {})
 
-    return NimHandler(
+    handler = NimHandler(
         paths=paths,
         base_dir=base_dir,
         config_options=options,
         **kwargs,
     )
+
+    if _is_zensical():
+        _setup_zensical_assets(handler)
+
+    return handler

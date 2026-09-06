@@ -2,21 +2,22 @@
 
 A [mkdocstrings](https://mkdocstrings.github.io/) handler for [Nim](https://nim-lang.org/).
 
-Parses Nim source files using the Nim compiler's AST to extract module docstrings, procedure signatures, parameter types, return types, and `{.raises.}` pragma annotations. Renders the extracted documentation as HTML within [MkDocs](https://www.mkdocs.org/) using the `::: module` directive syntax.
+Parses Nim source files using the Nim compiler's AST to extract module docstrings, procedure signatures, parameter types, return types, and `{.raises.}` pragma annotations. Renders the extracted documentation as HTML within [MkDocs](https://www.mkdocs.org/) or [Zensical](https://zensical.org/) using the standard `::: module` directive syntax.
 
 ## Features
 
 - **Automatic extraction** - Parses Nim source files using the Nim compiler's AST
 - **Docstring support** - RST-style docstrings with parameter and return documentation
 - **Pragma extraction** - Shows `{.raises.}` and other pragmas in docs
-- **Material theme** - Full support for mkdocs-material theme
+- **MkDocs & Zensical support** - First-class support for both MkDocs (Material theme) and Zensical (with automated asset injection)
+- **Material theme** - Full styling for Material for MkDocs and Zensical's modern/classic themes
 - **Versioned docs** - Works with mike for versioned documentation
 
 ## Requirements
 
 - Python 3.9+
 - Nim compiler (must be in PATH)
-- MkDocs with mkdocstrings
+- MkDocs or Zensical with mkdocstrings
 
 ## Quick Example
 

@@ -2,52 +2,83 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-09-06
 
 ### Added
 
-- `show_private` option to include non-exported (private) symbols in documentation
-- `show_attribution` option with "Generated with mkdocstrings-nim" footer (enabled by default)
-- `source_url` and `source_ref` options for clickable source links to GitHub/GitLab
-- Auto-detection of `source_ref` from current git branch
-- Configuration validation with warnings for malformed `source_url`
-- `exported` field tracking for Nim symbols (detects `*` export marker)
-- Documentation for source links, private symbols, and all handler options
+- Support for [Zensical](https://github.com/zensical/zensical) (the Rust-powered successor to MkDocs)
+- Automated post-build asset export: hooks `zensical.compat.mkdocstrings.get_inventory` to write `site/assets/stylesheets/mkdocstrings-nim.css` and template media assets
+- Inlined stylesheet link and CSS fallback in rendered HTML under Zensical for robust badge and syntax styling
+- Documentation, quickstart guides, and configuration examples (`zensical.toml`) for Zensical
+- Unit and end-to-end integration tests for Zensical builds
 
-### Changed
+## [0.2.1] - 2025-12-21
 
-- Cache now invalidates when source files are modified (fixes live reload with `mkdocs serve`)
-- Documented objects now appear in right-side TOC using mkdocstrings heading filter
-- Handler options from `mkdocs.yml` are now properly applied
+### Added
+
+- Pygments syntax highlighting for Nim code signatures (uses NimrodLexer)
+- Nim-specific symbol type styling with colors (const, var, let, type, proc, func, iterator, template, macro, converter)
+- Signature block styling with left accent border
+- Section heading styling (Parameters, Returns, Raises) with smaller, uppercase, muted appearance
+- Raises section with amber/orange warning styling
+- Pragma/label badges with key:value format support (e.g., `deprecated: "use X instead"`)
+- Source link styling as footnote-style references
+
+## [0.2.0] - 2025-12-04
+
+### Added
+
+- Type field documentation: Object and ref object types now display a **Fields** section
+- Enum value documentation: Enum types now display a **Values** section with explicit values
+- Case object (variant type) support with branch annotations (e.g., `[when kind = nkInt]`)
+- Private field visibility controlled by `show_private` option
+- `type_field_doc_style` config option: `inline` (default, Nim-native) or `docstring` (RST `:var:` style)
+- Comprehensive integration tests for type field extraction
+
+## [0.1.2] - 2025-12-03
 
 ### Fixed
 
-- Live reload now works correctly when Nim source files change
-- TOC integration: documented procs/types now appear in table of contents
-- Config options cascade correctly: defaults < config < directive options
+- CI: Switch from iffy/install-nim to asdf-nim for more reliable Nim installation
+- CI: Fix pyproject.toml structure (dependencies was incorrectly under [project.urls])
 
-### Testing
+## [0.1.1] - 2025-12-02
 
-- Expanded test suite from 25 to 45 tests (87% coverage)
-- Added tests for config validation, git branch detection, and error handling
-- Added tests for collector edge cases (JSON extraction, module parsing)
-- Added tests for docstring edge cases (empty, malformed, multi-paragraph)
+### Added
 
-## [0.1.0] - 2025-11-30
+- Strict linting with ruff and mypy
+- Pre-commit hooks for code quality
+- CI lint job that runs on all pushes and PRs
+- Publish and docs workflows now depend on test and lint passing
+- `show_private` option to include non-exported symbols (default: false)
+- Attribution footer with link to mkdocstrings-nim
+- Auto-detection of `source_ref` from git branch
+- Validation of `source_url` configuration
+- Source code links with GitHub/GitLab/Bitbucket support
+- TOC integration using heading filter
+- PyPI metadata: project URLs, keywords, license classifier
+- Improved README with complete quickstart guide for Nim developers
+
+### Fixed
+
+- Live reload now works correctly with cache invalidation
+- Heading levels properly integrate with MkDocs TOC
+- Config options properly applied from mkdocs.yml
+
+### Changed
+
+- Improved test coverage to 87%
+
+## [0.1.0] - 2025-11-29
 
 ### Added
 
 - Initial release
-- Nim source file parsing using compiler AST
-- Docstring style support: RST, Google, NumPy, Epydoc, and Auto detection
-- Parameter and return value documentation
-- Raises pragma extraction and display
+- Nim handler for mkdocstrings
+- Support for procs, funcs, templates, macros, types, and constants
+- RST, Google, NumPy, and Epydoc docstring style parsing
+- Pragma extraction and display
 - Material theme templates
-- Markdown rendering in docstrings
-- Compile-time caching of Nim extractor binary
-- Module, proc, func, iterator, template, macro, type, and const support
-- CI integration with GitHub Actions
-- Comprehensive test suite (24 tests)
