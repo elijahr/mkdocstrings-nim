@@ -13,41 +13,67 @@ Verify Nim is installed:
 nim --version
 ```
 
-## 1. Install the tools
+## Installation
 
-```bash
-pip install mkdocs mkdocs-material mkdocstrings-nim
-```
+=== "Zensical (Recommended)"
 
-## 2. Create mkdocs.yml
+    ```bash
+    pip install zensical mkdocstrings-nim
+    ```
 
-In your Nim project root, create `mkdocs.yml`:
+=== "MkDocs"
 
-```yaml
-site_name: My Nim Project
-theme:
-  name: material
+    ```bash
+    pip install mkdocs mkdocs-material mkdocstrings-nim
+    ```
 
-plugins:
-  - search
-  - mkdocstrings:
-      handlers:
-        nim:
-          paths: [src]  # Where your .nim files are
-          options:
-            show_source: true
-            docstring_style: rst
-            heading_level: 3  # Recommended for TOC integration
+## Configuration
 
-markdown_extensions:
-  - toc:
-      permalink: true
-      toc_depth: 4  # Include h2, h3, h4 in TOC
+=== "Zensical (`zensical.toml`)"
 
-watch:
-  - docs
-  - src  # Reload when Nim source files change
-```
+    Create `zensical.toml` in your project root:
+
+    ```toml
+    [project]
+    site_name = "My Nim Project"
+
+    [project.plugins.mkdocstrings]
+    default_handler = "nim"
+
+    [project.plugins.mkdocstrings.handlers.nim]
+    paths = ["src"]
+    ```
+
+=== "MkDocs (`mkdocs.yml`)"
+
+    Create `mkdocs.yml` in your project root:
+
+    ```yaml
+    site_name: My Nim Project
+    theme:
+      name: material
+
+    plugins:
+      - search
+      - mkdocstrings:
+          default_handler: nim
+          handlers:
+            nim:
+              paths: [src]
+              options:
+                show_source: true
+                docstring_style: rst
+                heading_level: 3
+
+    markdown_extensions:
+      - toc:
+          permalink: true
+          toc_depth: 4
+
+    watch:
+      - docs
+      - src
+    ```
 
 ## 3. Create your docs
 
@@ -101,17 +127,33 @@ proc init*(cfg: Config): bool =
 
 ## 5. Run the docs server
 
-```bash
-mkdocs serve
-```
+=== "Zensical"
+
+    ```bash
+    zensical serve
+    ```
+
+=== "MkDocs"
+
+    ```bash
+    mkdocs serve
+    ```
 
 Open http://127.0.0.1:8000 to see your documentation.
 
 ## 6. Build for deployment
 
-```bash
-mkdocs build
-```
+=== "Zensical"
+
+    ```bash
+    zensical build
+    ```
+
+=== "MkDocs"
+
+    ```bash
+    mkdocs build
+    ```
 
 This creates a `site/` directory with static HTML ready to deploy to GitHub Pages, Netlify, or any static host.
 

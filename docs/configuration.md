@@ -2,25 +2,50 @@
 
 ## Handler Options
 
-Configure the Nim handler in `mkdocs.yml`:
+Configure the Nim handler in your configuration file:
 
-```yaml
-plugins:
-  - mkdocstrings:
-      default_handler: nim
-      handlers:
-        nim:
-          paths: [src]
-          options:
-            docstring_style: rst
-            show_source: true
-            show_signature: true
-            show_pragmas: true
-            show_private: false
-            heading_level: 2
-            source_url: https://github.com/owner/repo
-            source_ref: main
-```
+=== "Zensical (`zensical.toml`)"
+
+    ```toml
+    [project]
+    site_name = "My Nim Project"
+
+    [project.plugins.mkdocstrings]
+    default_handler = "nim"
+
+    [project.plugins.mkdocstrings.handlers.nim]
+    paths = ["src"]
+
+    [project.plugins.mkdocstrings.handlers.nim.options]
+    docstring_style = "rst"
+    show_source = true
+    show_signature = true
+    show_pragmas = true
+    show_private = false
+    heading_level = 2
+    source_url = "https://github.com/owner/repo"
+    source_ref = "main"
+    ```
+
+=== "MkDocs (`mkdocs.yml`)"
+
+    ```yaml
+    plugins:
+      - mkdocstrings:
+          default_handler: nim
+          handlers:
+            nim:
+              paths: [src]
+              options:
+                docstring_style: rst
+                show_source: true
+                show_signature: true
+                show_pragmas: true
+                show_private: false
+                heading_level: 2
+                source_url: https://github.com/owner/repo
+                source_ref: main
+    ```
 
 ### Options Reference
 

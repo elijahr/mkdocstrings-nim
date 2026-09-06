@@ -5,28 +5,62 @@
 [![License](https://img.shields.io/github/license/elijahr/mkdocstrings-nim)](https://github.com/elijahr/mkdocstrings-nim/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-elijahr.github.io%2Fmkdocstrings--nim-blue)](https://elijahr.github.io/mkdocstrings-nim/)
 
-Generate API documentation for your Nim projects.
+Generate API documentation for your Nim projects with [MkDocs](https://www.mkdocs.org/) or [Zensical](https://zensical.org/).
 
-mkdocstrings-nim extracts documentation from Nim source files using the Nim compiler's AST, including module docstrings, procedure signatures, parameter types, return types, and pragma annotations. It renders the documentation as HTML using [MkDocs](https://www.mkdocs.org/) and [mkdocstrings](https://mkdocstrings.github.io/).
+mkdocstrings-nim extracts documentation from Nim source files using the Nim compiler's AST, including module docstrings, procedure signatures, parameter types, return types, and pragma annotations. It renders the documentation as HTML using **mkdocstrings** with either **MkDocs** (and `mkdocs-material`) or **Zensical** (the next-generation MkDocs successor).
 
 **[Full Documentation](https://elijahr.github.io/mkdocstrings-nim/)** | **[Changelog](https://github.com/elijahr/mkdocstrings-nim/blob/main/CHANGELOG.md)**
 
 ## Quick Start
-
-This guide gets you from zero to a running documentation server for your Nim project.
 
 ### Prerequisites
 
 - **Nim** compiler installed and in PATH ([install Nim](https://nim-lang.org/install.html))
 - **Python 3.9+** ([install Python](https://www.python.org/downloads/))
 
-### 1. Install the tools
+---
+
+### Using with Zensical (Recommended)
+
+[Zensical](https://zensical.org/) is the high-performance successor to MkDocs by the creators of Material for MkDocs. mkdocstrings-nim supports Zensical out-of-the-box, automatically generating required CSS and media assets in `site/` during build.
+
+#### 1. Install
+
+```bash
+pip install zensical mkdocstrings-nim
+```
+
+#### 2. Configure `zensical.toml`
+
+```toml
+[project]
+site_name = "My Nim Project"
+
+[project.plugins.mkdocstrings]
+default_handler = "nim"
+
+[project.plugins.mkdocstrings.handlers.nim]
+paths = ["src"]
+```
+
+#### 3. Run
+
+```bash
+zensical serve    # local dev server
+zensical build    # build static site
+```
+
+---
+
+### Using with MkDocs
+
+#### 1. Install
 
 ```bash
 pip install mkdocs mkdocs-material mkdocstrings-nim
 ```
 
-### 2. Create mkdocs.yml
+#### 2. Configure `mkdocs.yml`
 
 In your Nim project root, create `mkdocs.yml`:
 
@@ -46,7 +80,16 @@ plugins:
             docstring_style: rst
 ```
 
-### 3. Create your docs
+#### 3. Run
+
+```bash
+mkdocs serve    # local dev server
+mkdocs build    # build static site
+```
+
+---
+
+### Documenting Your Code
 
 Create a `docs/` directory with an `index.md`:
 
@@ -66,12 +109,6 @@ Welcome to my project documentation.
 ```
 
 The `::: mymodule` directive tells mkdocstrings to extract and render documentation from `src/mymodule.nim`.
-
-### 4. Run the docs server
-
-```bash
-mkdocs serve
-```
 
 Open http://127.0.0.1:8000 to see your documentation.
 
